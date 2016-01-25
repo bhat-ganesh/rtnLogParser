@@ -6,3 +6,10 @@ Apr 10 14:55:36 |NORMAL|
 Apr 10 14:55:36 |NORMAL|-keyup: 0x40000087
 Apr 10 14:55:37 |NORMAL|+key: 0x40000088
 Apr 10 14:55:37 |NORMAL|+key: 0x40000004
+
+Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 51 --
+Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --
+Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 50 --
+Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 49 --
+Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 53 --
+
