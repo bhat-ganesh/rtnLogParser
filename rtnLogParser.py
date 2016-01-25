@@ -62,7 +62,8 @@ keyMap = {
 
 counter = 0
 keyCounter = 0
-firstKeyPressInfo = "<LINE> : <TIME> : <KEY>\n\n"
+logSearchInfo = "_rtnLogParser_"
+keyPressInfo = "<LINE> : <TIME> : <KEY>\n\n"
 
 #######################################################################################
 
@@ -80,15 +81,15 @@ def usageInfo():
     print ">>>>>"
     print "RTN log parser"
     print "Usage: "+sys.argv[0]+" <path>/<logfile>"
-    print "Look for: KEY_PRESS = <key>"
+    print "Look for: " + logSearchInfo
     print "Output: <path>/<logfile>_changed"
     print "<<<<<"
     return
 
-def keyParser( line ):
+def keyPressParser( line ):
     global counter
     global keyCounter
-    global firstKeyPressInfo
+    global keyPressInfo
 
     matchKeyPress = re.search(keyPressPattern, line)
     if matchKeyPress:
@@ -100,14 +101,18 @@ def keyParser( line ):
         except:
             keyName = keyCode
         line = line.rstrip('\n')
-        contents[lineCount] = line + " KEY_PRESS = " + keyName + "\n"
+        contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + keyName + "\n"
 
         matchFirstKeyPress = re.search(firstKeyPattern, line)
         if matchFirstKeyPress:
             keyCounter = keyCounter + 1
             matchKeyTime = re.search(keyTimePattern, line)
             keyTime = matchKeyTime.group()
-            firstKeyPressInfo += str(lineCount+1) + " : " + keyTime + " : " + keyName + "\n"
+            keyPressInfo += str(lineCount+1) + " : " + keyTime + " : " + keyName + "\n"
+    return
+
+def lineParser( line ):
+    keyPressParser( line )
     return
 
 #######################################################################################
@@ -129,7 +134,7 @@ f.close()
 
 with open(sys.argv[1], 'r') as file:
     for lineCount, line in enumerate(file):
-        keyParser(line)
+        lineParser(line)
 
 # post process
 
@@ -139,12 +144,12 @@ if counter:
     contents = "".join(contents)
     f.write(contents)
     f.close()
-    print inFile + " processed successfully\n"
+    print inFile + " processed successfully.\n"
     print "Total number of key presses = " + str(keyCounter)
-    print firstKeyPressInfo
+    print keyPressInfo
     
-    print "Output file is " + outFile
-    print "Look for: KEY_PRESS = <key>"
+    print "Output file : " + outFile
+    print "Look for " + logSearchInfo + " in the log file."
     print "\nTo compare files before use run:"
     print "vimdiff " + outFile + " " + inFile
     print "\nTo use changed file run:"
