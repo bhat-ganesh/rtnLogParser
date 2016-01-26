@@ -76,13 +76,12 @@ LB_N = "line break no"
 
 # functions
 
-def logIt( message, breakLine=LB_Y, displayLog=NORMAL):
+def logIt( message, breakLine=LB_Y, displayLog=NORMAL ):
     global loggingMode
-    verboseStr = "[Verbose] "
 
     if ( (loggingMode == displayLog) or (loggingMode == VERBOSE) or (displayLog == FORCE) ):
         if (displayLog == VERBOSE):
-            message = verboseStr + message
+            message = "[VERBOSE] " + message
         if (breakLine == LB_Y):
             message = message + "\n"
 
@@ -122,7 +121,7 @@ def keyPressParser( line ):
         if keySignalIgnore :
             logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
             keySignalIgnore = 0;
-            return
+            return True
         
         keySignalIgnore = 1
         counter = counter+1
@@ -143,10 +142,39 @@ def keyPressParser( line ):
         matchKeyTime = re.search(keyTimePattern, line)
         keyTime = matchKeyTime.group()
         logHighlights += "line" + str(lineCount+1) + " : " + keyTime + " : " + keyName + "\n"
-    return
+        return True
+    return False
+
+def boxTypeParser( line ):
+    return False
+
+def buildInfoParser( line ):
+    return False
+
+def bootTimeParser( line ):
+    return False
+
+def uiLoadedParser( line ):
+    return False
+
+def networkObtainedParser( line ):
+    return False
+
+parsers = [
+        keyPressParser,
+        boxTypeParser,
+        buildInfoParser,
+        bootTimeParser,
+        uiLoadedParser,
+        networkObtainedParser
+        ]
 
 def lineParser( line ):
-    keyPressParser( line )
+    for parser in parsers:
+        logIt("Parsing line" + str(lineCount) + " calling " + str(parser.__name__), LB_N, VERBOSE)
+        ret = parser(line);
+        if ret:
+            break
     return
 
 #######################################################################################
@@ -157,7 +185,7 @@ try:
     inFile = sys.argv[1]
     f = open(inFile, "r")
 except:
-    logIt("ERR: invalid use", LB_Y, FORCE)
+    logIt("ERR: invalid use", LB_N, FORCE)
     usageInfo()
     quit()
 
@@ -186,7 +214,7 @@ if counter:
     logIt(inFile + " processed successfully.", LB_N)
     logIt("Following are highlights in " + inFile + ":")
     
-    logIt("****************************************************************************",0)
+    logIt("****************************************************************************", LB_N)
     logIt("Total number of key presses = " + str(keyCounter))
     logIt(logHighlights.strip(),0)
     logIt("****************************************************************************")
