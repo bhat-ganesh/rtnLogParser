@@ -65,6 +65,7 @@ keyCounter = 0
 keySignalIgnore = 0
 logSearchInfo = "_rtnLogParser_"
 logHighlights = ""
+loggingMode = ""
 
 #######################################################################################
 
@@ -75,11 +76,35 @@ logHighlights = ""
 
 # functions
 
+def logIt( message, newLine=1, displayLog="normal"):
+    global loggingMode
+    newLineStr = "\n"
+    verboseStr = "[Verbose] "
+
+    if ( (loggingMode == displayLog) or (loggingMode == "verbose") or (displayLog == "force") ):
+        if (displayLog == "verbose"):
+            message = verboseStr + message
+        if newLine:
+            message = message + newLineStr
+
+        print message
+    return
+
 def usageInfo():
-    print "RTN log parser"
-    print "Usage: "+sys.argv[0]+" <path>/<logfile>"
-    print "Look for: " + logSearchInfo
-    print "Output: <path>/<logfile>_changed"
+    logIt("RTN log parser", 1, "force")
+    logIt("*********************************************************", 0, "force")
+    logIt("Usage:", 1, "force")
+    logIt(sys.argv[0]+" logFile [logging]", 1, "force")
+    logIt("---------------------------------------------------------", 0, "force")
+    logIt("Required argument:", 0, "force")
+    logIt("@path : <path>/<logFile>", 1, "force")
+    logIt("---------------------------------------------------------", 0, "force")
+    logIt("Optional argument:", 0, "force")
+    logIt("@logging   : silent, normal, verbose. Default = normal", 0, "force")
+    logIt("   silent  : no logs from script", 0, "force")
+    logIt("   normal  : only script logging", 0, "force")
+    logIt("   verbose : all function logs", 1, "force")
+    logIt("*********************************************************", 0, "force")
     return
 
 def keyPressParser( line ):
@@ -95,6 +120,7 @@ def keyPressParser( line ):
     if matchKeyPress:
         
         if keySignalIgnore :
+            logIt("keyPressParser: ignoring second key signal", 1, "verbose")
             keySignalIgnore = 0;
             return
         
@@ -129,11 +155,16 @@ try:
     inFile = sys.argv[1]
     f = open(inFile, "r")
 except:
-    print "ERR: invalid use"
+    logIt("ERR: invalid use", 1, "force")
     usageInfo()
     quit()
 
-print "Processing file: " + inFile + "\n"
+try:
+    loggingMode = sys.argv[2]
+except:
+    loggingMode = "normal"
+
+logIt("Processing file: " + inFile)
 contents = f.readlines()
 f.close()
 
@@ -150,21 +181,23 @@ if counter:
     f.write(contents)
     f.close()
     
-    print inFile + " processed successfully."
-    print "Following are highlights in " + inFile + ":\n"
+    logIt(inFile + " processed successfully.", 0)
+    logIt("Following are highlights in " + inFile + ":")
     
-    print "****************************************************************************\n"
-    print "Total number of key presses = " + str(keyCounter)
-    print logHighlights
-    print "****************************************************************************\n"
+    logIt("****************************************************************************",0)
+    logIt("Total number of key presses = " + str(keyCounter))
+    logIt(logHighlights.strip(),0)
+    logIt("****************************************************************************")
     
-    print "Log highlights are also embedded in output file : " + outFile
-    print "Look for " + logSearchInfo + " in " + outFile
+    logIt("Log highlights are also embedded in output file : " + outFile, 0)
+    logIt("Look for " + logSearchInfo + " in " + outFile)
     
-    print "\nTo compare files:"
-    print "vimdiff " + outFile + " " + inFile
+    logIt("To compare files:", 0)
+    logIt("vimdiff " + outFile + " " + inFile)
     
-    print "\nTo use changed file:"
-    print "mv " + outFile + " " + inFile + "\n"
+    logIt("To use changed file:",0)
+    logIt("mv " + outFile + " " + inFile)
+else:
+    logIt("WARN: nothing to parse in " + inFile)
 
 #######################################################################################
