@@ -66,6 +66,9 @@ keySignalIgnore = 0
 logSearchInfo = "_rtnLogParser_"
 logHighlights = ""
 loggingMode = ""
+NORMAL = "normal"
+VERBOSE = "verbose"
+FORCE = "force"
 
 #######################################################################################
 
@@ -76,13 +79,13 @@ loggingMode = ""
 
 # functions
 
-def logIt( message, newLine=1, displayLog="normal"):
+def logIt( message, newLine=1, displayLog=NORMAL):
     global loggingMode
     newLineStr = "\n"
     verboseStr = "[Verbose] "
 
-    if ( (loggingMode == displayLog) or (loggingMode == "verbose") or (displayLog == "force") ):
-        if (displayLog == "verbose"):
+    if ( (loggingMode == displayLog) or (loggingMode == VERBOSE) or (displayLog == FORCE) ):
+        if (displayLog == VERBOSE):
             message = verboseStr + message
         if newLine:
             message = message + newLineStr
@@ -91,20 +94,22 @@ def logIt( message, newLine=1, displayLog="normal"):
     return
 
 def usageInfo():
-    logIt("RTN log parser", 1, "force")
-    logIt("*********************************************************", 0, "force")
-    logIt("Usage:", 1, "force")
-    logIt(sys.argv[0]+" logFile [logging]", 1, "force")
-    logIt("---------------------------------------------------------", 0, "force")
-    logIt("Required argument:", 0, "force")
-    logIt("@path : <path>/<logFile>", 1, "force")
-    logIt("---------------------------------------------------------", 0, "force")
-    logIt("Optional argument:", 0, "force")
-    logIt("@logging   : silent, normal, verbose. Default = normal", 0, "force")
-    logIt("   silent  : no logs from script", 0, "force")
-    logIt("   normal  : only script logging", 0, "force")
-    logIt("   verbose : all function logs", 1, "force")
-    logIt("*********************************************************", 0, "force")
+    logIt("*************************************", 0, FORCE)
+    logIt("            RTN log parser", 0, FORCE)
+    logIt("-------------------------------------", 0, FORCE)
+    logIt("Usage:", 1, FORCE)
+    logIt(sys.argv[0]+" logFile [logging]", 1, FORCE)
+    logIt("-------------------------------------", 0, FORCE)
+    logIt("Required argument:", 0, FORCE)
+    logIt("@path : <path>/<logFile>", 1, FORCE)
+    logIt("-------------------------------------", 0, FORCE)
+    logIt("Optional argument:", 0, FORCE)
+    logIt("@logging   : silent, normal, verbose", 0, FORCE)
+    logIt("             Default = normal", 0, FORCE)
+    logIt("   silent  : no logs", 0, FORCE)
+    logIt("   normal  : high level logs", 0, FORCE)
+    logIt("   verbose : function level logs", 1, FORCE)
+    logIt("*************************************", 0, FORCE)
     return
 
 def keyPressParser( line ):
@@ -120,7 +125,7 @@ def keyPressParser( line ):
     if matchKeyPress:
         
         if keySignalIgnore :
-            logIt("keyPressParser: ignoring second key signal", 1, "verbose")
+            logIt("keyPressParser: ignoring second key signal", 1, VERBOSE)
             keySignalIgnore = 0;
             return
         
@@ -155,14 +160,14 @@ try:
     inFile = sys.argv[1]
     f = open(inFile, "r")
 except:
-    logIt("ERR: invalid use", 1, "force")
+    logIt("ERR: invalid use", 1, FORCE)
     usageInfo()
     quit()
 
 try:
     loggingMode = sys.argv[2]
 except:
-    loggingMode = "normal"
+    loggingMode = NORMAL
 
 logIt("Processing file: " + inFile)
 contents = f.readlines()
