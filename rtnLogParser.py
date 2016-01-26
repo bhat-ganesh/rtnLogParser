@@ -69,47 +69,43 @@ loggingMode = ""
 NORMAL = "normal"
 VERBOSE = "verbose"
 FORCE = "force"
-
-#######################################################################################
-
-# patterns
-
+LB_Y = "line break yes"
+LB_N = "line break no"
 
 #######################################################################################
 
 # functions
 
-def logIt( message, newLine=1, displayLog=NORMAL):
+def logIt( message, breakLine=LB_Y, displayLog=NORMAL):
     global loggingMode
-    newLineStr = "\n"
     verboseStr = "[Verbose] "
 
     if ( (loggingMode == displayLog) or (loggingMode == VERBOSE) or (displayLog == FORCE) ):
         if (displayLog == VERBOSE):
             message = verboseStr + message
-        if newLine:
-            message = message + newLineStr
+        if (breakLine == LB_Y):
+            message = message + "\n"
 
         print message
     return
 
 def usageInfo():
-    logIt("*************************************", 0, FORCE)
-    logIt("            RTN log parser", 0, FORCE)
-    logIt("-------------------------------------", 0, FORCE)
-    logIt("Usage:", 1, FORCE)
-    logIt(sys.argv[0]+" logFile [logging]", 1, FORCE)
-    logIt("-------------------------------------", 0, FORCE)
-    logIt("Required argument:", 0, FORCE)
-    logIt("@path : <path>/<logFile>", 1, FORCE)
-    logIt("-------------------------------------", 0, FORCE)
-    logIt("Optional argument:", 0, FORCE)
-    logIt("@logging   : silent, normal, verbose", 0, FORCE)
-    logIt("             Default = normal", 0, FORCE)
-    logIt("   silent  : no logs", 0, FORCE)
-    logIt("   normal  : high level logs", 0, FORCE)
-    logIt("   verbose : function level logs", 1, FORCE)
-    logIt("*************************************", 0, FORCE)
+    logIt("*************************************", LB_N, FORCE)
+    logIt("            RTN log parser", LB_N, FORCE)
+    logIt("-------------------------------------", LB_N, FORCE)
+    logIt("Usage:", LB_Y, FORCE)
+    logIt(sys.argv[0]+" logFile [logging]", LB_Y, FORCE)
+    logIt("-------------------------------------", LB_N, FORCE)
+    logIt("Required argument:", LB_N, FORCE)
+    logIt("@path : <path>/<logFile>", LB_Y, FORCE)
+    logIt("-------------------------------------", LB_N, FORCE)
+    logIt("Optional argument:", LB_N, FORCE)
+    logIt("@logging   : silent, normal, verbose", LB_N, FORCE)
+    logIt("             Default = normal", LB_N, FORCE)
+    logIt("   silent  : no logs", LB_N, FORCE)
+    logIt("   normal  : high level logs", LB_N, FORCE)
+    logIt("   verbose : function level logs", LB_Y, FORCE)
+    logIt("*************************************", LB_N, FORCE)
     return
 
 def keyPressParser( line ):
@@ -123,9 +119,8 @@ def keyPressParser( line ):
 
     matchKeyPress = re.search(keyPressPattern, line)
     if matchKeyPress:
-        
         if keySignalIgnore :
-            logIt("keyPressParser: ignoring second key signal", 1, VERBOSE)
+            logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
             keySignalIgnore = 0;
             return
         
@@ -140,6 +135,8 @@ def keyPressParser( line ):
         except:
             keyName = keyCode
         
+        logIt("keyPressParser: key press found = " + keyName, LB_Y, VERBOSE)
+
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + keyName + "\n"
 
@@ -160,7 +157,7 @@ try:
     inFile = sys.argv[1]
     f = open(inFile, "r")
 except:
-    logIt("ERR: invalid use", 1, FORCE)
+    logIt("ERR: invalid use", LB_Y, FORCE)
     usageInfo()
     quit()
 
@@ -186,7 +183,7 @@ if counter:
     f.write(contents)
     f.close()
     
-    logIt(inFile + " processed successfully.", 0)
+    logIt(inFile + " processed successfully.", LB_N)
     logIt("Following are highlights in " + inFile + ":")
     
     logIt("****************************************************************************",0)
@@ -194,13 +191,13 @@ if counter:
     logIt(logHighlights.strip(),0)
     logIt("****************************************************************************")
     
-    logIt("Log highlights are also embedded in output file : " + outFile, 0)
+    logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
     logIt("Look for " + logSearchInfo + " in " + outFile)
     
-    logIt("To compare files:", 0)
+    logIt("To compare files:", LB_N)
     logIt("vimdiff " + outFile + " " + inFile)
     
-    logIt("To use changed file:",0)
+    logIt("To use changed file:", LB_N)
     logIt("mv " + outFile + " " + inFile)
 else:
     logIt("WARN: nothing to parse in " + inFile)
