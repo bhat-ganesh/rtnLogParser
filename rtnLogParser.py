@@ -62,53 +62,59 @@ keyMap = {
 
 counter = 0
 keyCounter = 0
+keySignalIgnore = 0
 logSearchInfo = "_rtnLogParser_"
-keyPressInfo = "<LINE> : <TIME> : <KEY>\n\n"
+logHighlights = ""
 
 #######################################################################################
 
 # patterns
 
-keyPressPattern = re.compile("^.*\|.sending key.*: .*$")
-firstKeyPattern = re.compile("\+key\:")
-keyTimePattern = re.compile("... .. ..:..:..")
 
 #######################################################################################
 
 # functions
 
 def usageInfo():
-    print ">>>>>"
     print "RTN log parser"
     print "Usage: "+sys.argv[0]+" <path>/<logfile>"
     print "Look for: " + logSearchInfo
     print "Output: <path>/<logfile>_changed"
-    print "<<<<<"
     return
 
 def keyPressParser( line ):
     global counter
     global keyCounter
-    global keyPressInfo
+    global logHighlights
+    global keySignalIgnore
+    
+    keyPressPattern = re.compile("^.*\|.key.*: .*$")
+    keyTimePattern = re.compile("... .. ..:..:..")
 
     matchKeyPress = re.search(keyPressPattern, line)
     if matchKeyPress:
+        
+        if keySignalIgnore :
+            keySignalIgnore = 0;
+            return
+        
+        keySignalIgnore = 1
         counter = counter+1
+        keyCounter = keyCounter + 1
+        
         keyCode = re.sub('^.*\|.key.*: ', '',matchKeyPress.group())
         keyCode = keyCode.strip()
         try:
             keyName = keyMap[keyCode];
         except:
             keyName = keyCode
+        
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + keyName + "\n"
 
-        matchFirstKeyPress = re.search(firstKeyPattern, line)
-        if matchFirstKeyPress:
-            keyCounter = keyCounter + 1
-            matchKeyTime = re.search(keyTimePattern, line)
-            keyTime = matchKeyTime.group()
-            keyPressInfo += str(lineCount+1) + " : " + keyTime + " : " + keyName + "\n"
+        matchKeyTime = re.search(keyTimePattern, line)
+        keyTime = matchKeyTime.group()
+        logHighlights += "line" + str(lineCount+1) + " : " + keyTime + " : " + keyName + "\n"
     return
 
 def lineParser( line ):
@@ -127,8 +133,7 @@ except:
     usageInfo()
     quit()
 
-print ">>>>>"
-print "Processing file: " + inFile
+print "Processing file: " + inFile + "\n"
 contents = f.readlines()
 f.close()
 
@@ -144,16 +149,22 @@ if counter:
     contents = "".join(contents)
     f.write(contents)
     f.close()
-    print inFile + " processed successfully.\n"
-    print "Total number of key presses = " + str(keyCounter)
-    print keyPressInfo
     
-    print "Output file : " + outFile
-    print "Look for " + logSearchInfo + " in the log file."
-    print "\nTo compare files before use run:"
+    print inFile + " processed successfully."
+    print "Following are highlights in " + inFile + ":\n"
+    
+    print "****************************************************************************\n"
+    print "Total number of key presses = " + str(keyCounter)
+    print logHighlights
+    print "****************************************************************************\n"
+    
+    print "Log highlights are also embedded in output file : " + outFile
+    print "Look for " + logSearchInfo + " in " + outFile
+    
+    print "\nTo compare files:"
     print "vimdiff " + outFile + " " + inFile
-    print "\nTo use changed file run:"
+    
+    print "\nTo use changed file:"
     print "mv " + outFile + " " + inFile + "\n"
-print "<<<<<"
 
 #######################################################################################
