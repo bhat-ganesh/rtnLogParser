@@ -1,18 +1,15 @@
 Image created for 9k box.
-Apr 10 14:55:35 |NORMAL|-key: 0x40000087
-Apr 10 14:55:35 |NORMAL|+key: 0x40000087 
-Apr 10 14:55:36 |NORMAL|+keyup: 0x40000087
-Apr 10 14:55:36 |NORMAL|+keyup: 0x40000087
-Apr 10 14:55:36 |NORMAL|
 Image created for 9k box.
-Apr 10 14:55:36 |NORMAL|
-Apr 10 14:55:36 |NORMAL|-keyup: 0x40000087
-Apr 10 14:55:36 |NORMAL|-keyup: 0x40000087
-Apr 10 14:55:37 |NORMAL|+key: 0x40000088
-Apr 10 14:55:37 |NORMAL|+key: 0x40000088
-Apr 10 14:55:37 |NORMAL|+key: 0x40000004
-Apr 10 14:55:37 |NORMAL|+key: 0x40000004
-
+Dec 31 19:00:52 powertv syslog: DLOG|SAILMSG|ERROR|MAC ADDRESS OF BOX is:84:8D:C7:6D:41:E0
+Dec 31 19:00:52 powertv syslog: DLOG|SAILMSG|ERROR|MAC ADDRESS OF BOX is:84:8D:C7:6D:41:E0
+Jan 27 11:21:07 powertv syslog: timeZoneOffset =-300
+Jan 27 11:21:07 powertv syslog: timeZoneOffset =-300
+Jan 27 11:23:28 powertv syslog: DLOG|BFS_GET_MODULE|EMERGENCY|get_filter_setting_for_module - 625 assertion failed
+Jan 27 11:23:28 powertv syslog: DLOG|BFS_GET_MODULE|EMERGENCY|get_filter_setting_for_module - 625 assertion failed
+Jan 25 10:47:55 powertv syslog: DLOG|BFSUTILITY|EMERGENCY|BFS Init Done!
+Jan 25 10:47:55 powertv syslog: DLOG|BFSUTILITY|EMERGENCY|BFS Init Done!
+Jan 27 11:24:16 powertv syslog: DLOG|MDA|NORMAL|mda_network_get_string: IP address = 7.255.4.141
+Jan 27 11:24:16 powertv syslog: DLOG|MDA|NORMAL|mda_network_get_string: IP address = 7.255.4.141
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 51 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 51 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --

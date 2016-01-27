@@ -81,6 +81,10 @@ boxTypeMap = {
     '10k' : 'G10 10K'
 }
 
+bfsInit = ""
+ipAddress = ""
+macAddress = ""
+
 #-----------------------------------------------------------------------------#
 
 # functions
@@ -196,21 +200,117 @@ def boxTypeParser( line ):
 #.............................................................................#
 
 def buildInfoParser( line ):
-    return False
+    
 
-#.............................................................................#
-
-def bootTimeParser( line ):
     return False
 
 #.............................................................................#
 
 def uiLoadedParser( line ):
+    
+    
     return False
 
 #.............................................................................#
 
-def networkObtainedParser( line ):
+def bfsInitDoneParser( line ):
+    #Jan 25 10:47:55 powertv syslog: DLOG|BFSUTILITY|EMERGENCY|BFS Init Done!
+    global logHighlights
+    global bfsInit
+
+    pattern = re.compile("^.*\|BFS Init Done!$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*\|BFS', 'BFS', match.group())
+        val = val.strip()
+
+        if (bfsInit == val):
+            logIt("bfsInitDoneParser: data already parsed, ignoring", LB_Y, VERBOSE)
+            return True
+        
+        bfsInit = val
+        logStr = " : "
+        logIt("bfsInitDoneParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def bfsDnldCrashParser( line ):
+    #Jan 27 11:23:28 powertv syslog: DLOG|BFS_GET_MODULE|EMERGENCY|get_filter_setting_for_module - 625 assertion failed
+    global logHighlights
+
+    pattern = re.compile("^.* - 625 assertion failed$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.* - 625 assertion failed$', '625 assertion failed', match.group())
+        val = val.strip()
+
+        logStr = " : BFS dnld crash CSCux30595 : "
+        logIt("bfsDnldCrashParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def ipAddressParser( line ):
+    #Jan 27 11:24:16 powertv syslog: DLOG|MDA|NORMAL|mda_network_get_string: IP address = 7.255.4.141
+    global logHighlights
+    global ipAddress
+
+    pattern = re.compile("^.*: IP address = .*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*: IP address = ', '', match.group())
+        val = val.strip()
+
+        if (ipAddress == val):
+            logIt("ipAddressParser: data already parsed, ignoring", LB_Y, VERBOSE)
+            return True
+        
+        ipAddress = val
+        logStr = " : IP Address : "
+        logIt("ipAddressParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def macAddressParser( line ):
+    #Dec 31 19:00:52 powertv syslog: DLOG|SAILMSG|ERROR|MAC ADDRESS OF BOX is:84:8D:C7:6D:41:E0
+    global logHighlights
+    global macAddress
+
+    pattern = re.compile("^.*MAC ADDRESS OF BOX is.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*MAC ADDRESS OF BOX is:', '', match.group())
+        val = val.strip()
+
+        if (macAddress == val):
+            logIt("macAddressParser: data already parsed, ignoring", LB_Y, VERBOSE)
+            return True
+        
+        macAddress = val
+        logStr = " : MAC Address : "
+        logIt("macAddressParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + logStr + val + "\n"
+        return True
     return False
 
 #.............................................................................#
@@ -219,12 +319,12 @@ parsers = [
         keyPressParser,
         boxTypeParser,
         buildInfoParser,
-        bootTimeParser,
         uiLoadedParser,
-        networkObtainedParser
+        bfsInitDoneParser,
+        bfsDnldCrashParser,
+        ipAddressParser,
+        macAddressParser
         ]
-
-#.............................................................................#
 
 def lineParser( line ):
     for parser in parsers:
