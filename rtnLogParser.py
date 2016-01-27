@@ -3,7 +3,7 @@
 import sys
 import re
 
-#######################################################################################
+#-----------------------------------------------------------------------------#
 
 # globals
 
@@ -73,7 +73,7 @@ FORCE = "force"
 LB_Y = "line break yes"
 LB_N = "line break no"
 
-#######################################################################################
+#-----------------------------------------------------------------------------#
 
 # functions
 
@@ -89,6 +89,8 @@ def logIt( message, breakLine=LB_Y, displayLog=NORMAL ):
         print message
     return
 
+#.............................................................................#
+
 def usageInfo():
     logIt("*************************************", LB_N, FORCE)
     logIt("            RTN log parser", LB_N, FORCE)
@@ -97,16 +99,18 @@ def usageInfo():
     logIt(sys.argv[0]+" logFile [logging]", LB_Y, FORCE)
     logIt("-------------------------------------", LB_N, FORCE)
     logIt("Required argument:", LB_N, FORCE)
-    logIt("@path : <path>/<logFile>", LB_Y, FORCE)
+    logIt("@logFile : <path>/<logFile>", LB_Y, FORCE)
     logIt("-------------------------------------", LB_N, FORCE)
     logIt("Optional argument:", LB_N, FORCE)
-    logIt("@logging   : silent, normal, verbose", LB_N, FORCE)
-    logIt("             Default = normal", LB_N, FORCE)
-    logIt("   silent  : no logs", LB_N, FORCE)
-    logIt("   normal  : high level logs", LB_N, FORCE)
-    logIt("   verbose : function level logs", LB_Y, FORCE)
+    logIt("@logging : silent, normal, verbose", LB_N, FORCE)
+    logIt("         : Default = normal", LB_N, FORCE)
+    logIt("  silent : no logs", LB_N, FORCE)
+    logIt("  normal : high level logs", LB_N, FORCE)
+    logIt(" verbose : function level logs", LB_Y, FORCE)
     logIt("*************************************", LB_N, FORCE)
     return
+
+#.............................................................................#
 
 def dateTimeParser( line ):
     dateTimePattern = re.compile("... .. ..:..:..")
@@ -114,6 +118,8 @@ def dateTimeParser( line ):
     dateTime = matchDateTime.group()
     # logIt("dateTimeParser: " + dateTime, LB_N, VERBOSE)
     return dateTime
+
+#.............................................................................#
 
 def keyPressParser( line ):
     global counter
@@ -145,27 +151,39 @@ def keyPressParser( line ):
         except:
             keyName = keyCode
         
-        logIt("keyPressParser: key press found = " + keyName, LB_Y, VERBOSE)
+        logIt("keyPressParser: key press found = " + keyName, LB_N, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + keyName + "\n"
         logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + " : key " + keyName + "\n"
         return True
     return False
 
+#.............................................................................#
+
 def boxTypeParser( line ):
     return False
+
+#.............................................................................#
 
 def buildInfoParser( line ):
     return False
 
+#.............................................................................#
+
 def bootTimeParser( line ):
     return False
+
+#.............................................................................#
 
 def uiLoadedParser( line ):
     return False
 
+#.............................................................................#
+
 def networkObtainedParser( line ):
     return False
+
+#.............................................................................#
 
 parsers = [
         keyPressParser,
@@ -176,15 +194,17 @@ parsers = [
         networkObtainedParser
         ]
 
+#.............................................................................#
+
 def lineParser( line ):
     for parser in parsers:
-        logIt("Parsing line" + str(lineCount) + " calling " + str(parser.__name__), LB_N, VERBOSE)
+        # logIt("Parsing line" + str(lineCount) + " calling " + str(parser.__name__), LB_N, VERBOSE)
         ret = parser(line);
         if ret:
             break
     return
 
-#######################################################################################
+#-----------------------------------------------------------------------------#
 
 # main
 
@@ -209,6 +229,8 @@ with open(sys.argv[1], 'r') as file:
     for lineCount, line in enumerate(file):
         lineParser(line)
 
+#.............................................................................#
+
 # post process
 
 if counter:
@@ -221,10 +243,10 @@ if counter:
     logIt(inFile + " processed successfully.", LB_N)
     logIt("Following are highlights in " + inFile + ":")
     
-    logIt("****************************************************************************", LB_N)
+    logIt("**************************************", LB_N)
     logIt("Total number of key presses = " + str(keyCounter))
     logIt(logHighlights.strip(),0)
-    logIt("****************************************************************************")
+    logIt("**************************************")
     
     logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
     logIt("Look for " + logSearchInfo + " in " + outFile)
@@ -237,4 +259,4 @@ if counter:
 else:
     logIt("WARN: nothing to parse in " + inFile)
 
-#######################################################################################
+#-----------------------------------------------------------------------------#
