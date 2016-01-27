@@ -421,7 +421,7 @@ def recDel_lowDiskSpaceParser( line ):
 
 #.............................................................................#
 
-def recNotPlayableParser( line ):
+def recNotPlayable_BadStateParser( line ):
     #Dec 22 16:14:53 powertv syslog: DLOG|MSP_DVR|ERROR|RecSession:stopConvert:808 RecordSessionStateError: Error Bad state: 3
     global logHighlights
 
@@ -433,7 +433,26 @@ def recNotPlayableParser( line ):
         val = val.strip()
 
         logStr = " : Recording not playable : "
-        logIt("recNotPlayableParser" + logStr + val, LB_Y, VERBOSE)
+        logIt("recNotPlayable_BadStateParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recNotPlayable_deAuthParser( line ):
+    #Nov 13 10:49:26 powertv csp_CPERP: DLOG|CA_CAK|NORMAL|****** ECM 16 Digital_Response, result 0xb
+    global logHighlights
+
+    pattern = re.compile("^.*ECM 16 Digital_Response, result 0xb$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Recording not playable : due to deauthorization"
+        logIt("recNotPlayable_deAuthParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -450,7 +469,7 @@ def blackScreen_Err19Parser( line ):
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub('^.*cpe_media_Stop error -19', 'cpe_media_Stop error -19', match.group())
+        val = re.sub('^.*cpe_media_Stop error -19', 'cpe_media_Stop2yy error -19', match.group())
         val = val.strip()
 
         logStr = " : CSCup37738 Black Screen on all channels : due to "
@@ -519,6 +538,26 @@ def blackScreen_patTimeoutParser( line ):
     return False
 
 #.............................................................................#
+
+def blackScreen_pmtNoInfoParser( line ):
+    #Nov 11 00:10:17 powertv csp_CPERP: DLOG|MSP_MPLAYER|ERROR|Zapper:GetComponents:1717 PSI/PMT Info Not found
+    global logHighlights
+
+    pattern = re.compile("^.*PMT Info Not found$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Black screen : stream issue - no pmt"
+        logIt("blackScreen_pmtNoInfoParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def stuck04Parser( line ):
     #Dec 31 19:01:37 powertv csp_CPERP: DLOG|SAM|ERROR|Thread Setname Failed:threadRetValue:0
     global logHighlights
@@ -530,6 +569,110 @@ def stuck04Parser( line ):
         val = ""
         logStr = " : Stuck at -04- : due to SAM not ready "
         logIt("stuck04Parser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def serviceDeAuthParser( line ):
+    #Nov 21 05:25:25 powertv csp_CPERP: DLOG|MSP_DVR|ERROR|dvr:dispatchEvent:1022 Service DeAuthorized by CAM
+    global logHighlights
+
+    pattern = re.compile("^.*Service DeAuthorized by CAM$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Service deauthorized "
+        logIt("serviceDeAuthParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def noAuthECMParser( line ):
+    #Nov 21 05:25:25 powertv csp_CPERP: DLOG|CA_CAK|ERROR|PkCakDvrRecordSession_cronus.cpp:383 Async No authorized ECM in CA message
+    global logHighlights
+
+    pattern = re.compile("^.*No authorized ECM in CA message$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : No authorized ECM in CA message "
+        logIt("noAuthECMParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def channelNAParser( line ):
+    #Nov 13 01:43:41 powertv syslog: DLOG|SDV|ERROR|ccmisProtocol.cpp HandleProgramSelectIndication Channel is not available
+    global logHighlights
+
+    pattern = re.compile("^.*Channel is not available$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Channel is not available"
+        logIt("channelNAParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def uiErrLoadingParser( line ):
+    #Nov 12 21:20:30 powertv bfsdnld: DLOG|BFS_GET_MODULE|ERROR|directory_update_timeout directory update taking more than 120 seconds
+    global logHighlights
+
+    pattern = re.compile("^.*directory update taking more than 120 seconds$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Stuck on -05- due to ui error loading"
+        logIt("uiErrLoadingParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def bootUpSequenceParser( line ):
+    #Dec 31 19:01:13 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling:      Application started => Waiting for SessInit : 49.64 seconds, total time: 91.46 seconds (BUFFERED)
+    #Dec 31 19:01:29 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -00- SessInit is ready => Waiting for Hub Id : 2.02 seconds, total time: 93.48 seconds (BUFFERED)
+    #Dec 31 19:01:29 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -01- Hub Id is ready => Waiting for SI : 15.04 seconds, total time: 108.53 seconds (BUFFERED)
+    #Jan 27 11:21:07 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -02- SI is ready => Waiting for BFS : 65.44 seconds, total time: 173.96 seconds (BUFFERED)
+    #Jan 27 11:21:07 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -03- BFS is ready => Waiting for SAM : 0.02 seconds, total time: 173.99 seconds
+    #Jan 27 11:21:09 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -04- SAM is ready => Waiting for global config : 2.03 seconds, total time: 176.01 seconds
+    #Jan 27 11:21:16 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -05- Global config is ready => Launching UI : 2.02 seconds, total time: 178.03 seconds
+    #Jan 27 11:24:50 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling:      UI launched => System ready : 218.45 seconds, total time: 396.48 seconds
+    global logHighlights
+
+    pattern = re.compile("^.*Bootup profiling:.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( ' =>.*$', '', re.sub('^.*Bootup profiling: ', '', match.group()))
+        val = val.strip()
+        
+        logStr = " : Bootup step : "
+        logIt("bootUpSequenceParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -552,12 +695,19 @@ parsers = [
         recFail_CLMstart,
         recFail_CLMsuccess,
         recDel_lowDiskSpaceParser,
-        recNotPlayableParser,
+        recNotPlayable_BadStateParser,
+        recNotPlayable_deAuthParser,
         blackScreen_Err19Parser,
         blackScreen_vodStreamIssueParser,
         blackScreen_signalStreamIssueParser,
         blackScreen_patTimeoutParser,
-        stuck04Parser
+        blackScreen_pmtNoInfoParser,
+        stuck04Parser,
+        serviceDeAuthParser,
+        noAuthECMParser,
+        channelNAParser,
+        uiErrLoadingParser,
+        bootUpSequenceParser
         ]
 
 def lineParser( line ):
