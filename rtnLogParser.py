@@ -104,22 +104,24 @@ def logIt( message, breakLine=LB_Y, displayLog=NORMAL ):
 #.............................................................................#
 
 def usageInfo():
-    logIt("*************************************", LB_N, FORCE)
-    logIt("            RTN log parser", LB_N, FORCE)
-    logIt("-------------------------------------", LB_N, FORCE)
+    logIt("*****************************************************", LB_N, FORCE)
+    logIt("                 RTN Log Parser", LB_N, FORCE)
+    logIt("-----------------------------------------------------", LB_N, FORCE)
     logIt("Usage:", LB_Y, FORCE)
     logIt(sys.argv[0]+" logFile [logging]", LB_Y, FORCE)
-    logIt("-------------------------------------", LB_N, FORCE)
-    logIt("Required argument:", LB_N, FORCE)
+    logIt("Example  : ./rtnLogParser.py slog", LB_Y, FORCE)
+    logIt("-----------------------------------------------------", LB_N, FORCE)
+    logIt("Required argument:", LB_Y, FORCE)
     logIt("@logFile : <path>/<logFile>", LB_Y, FORCE)
-    logIt("-------------------------------------", LB_N, FORCE)
-    logIt("Optional argument:", LB_N, FORCE)
-    logIt("@logging : silent, normal, verbose", LB_N, FORCE)
+    logIt("-----------------------------------------------------", LB_N, FORCE)
+    logIt("Optional argument:", LB_Y, FORCE)
+    logIt("@logging : used for script debugging", LB_N, FORCE)
+    logIt("         : Possible values = silent, normal, verbose", LB_N, FORCE)
     logIt("         : Default = normal", LB_N, FORCE)
-    logIt("  silent : no logs", LB_N, FORCE)
-    logIt("  normal : high level logs", LB_N, FORCE)
-    logIt(" verbose : function level logs", LB_Y, FORCE)
-    logIt("*************************************", LB_N, FORCE)
+    logIt("         : silent  : no logs", LB_N, FORCE)
+    logIt("         : normal  : high level logs", LB_N, FORCE)
+    logIt("         : verbose : function level logs", LB_Y, FORCE)
+    logIt("*****************************************************", LB_N, FORCE)
     return
 
 #.............................................................................#
@@ -260,6 +262,25 @@ def bfsDnldCrashParser( line ):
     return False
 
 #.............................................................................#
+def bfsBrokenPipeParser( line ):
+    #Jan 20 12:28:14 powertv csp_CPERP: DLOG|BFS_GET_MODULE|ERROR|bool CSCI_BFS_API::ActiveContext::_serializeAndSendPacket(int, BfsIpc::PacketBuilder&) - 222 Error sending eIpc_BeginDownload packet to BFS server - send /tmp/bfs_server error Broken pipe
+    global logHighlights
+
+    pattern = re.compile("^.*BFS.* error Broken pipe$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*BFS.* error Broken pipe$', 'UI not available due to BFS error broken pipe', match.group())
+        val = val.strip()
+
+        logStr = " : "
+        logIt("bfsBrokenPipeParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+#.............................................................................#
 
 def ipAddressParser( line ):
     #Jan 27 11:24:16 powertv syslog: DLOG|MDA|NORMAL|mda_network_get_string: IP address = 7.255.4.141
@@ -315,6 +336,69 @@ def macAddressParser( line ):
 
 #.............................................................................#
 
+def recFail_lowDiskSpaceParser( line ):
+    #Jan 25 06:00:04 powertv csp_CPERP: DLOG|DVR|Recording Failure|TimerHandler: Failure not enough disk space to record Breakfast Television AID 113
+    global logHighlights
+
+    pattern = re.compile("^.*Failure not enough disk space to record.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*Failure not enough disk space to record.*$', 'not enough disk space to record', match.group())
+        val = val.strip()
+
+        logStr = " : Recording failed : "
+        logIt("recFail_lowDiskSpaceParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recFail_CLMstart( line ):
+    #Jan 13 21:19:16 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050030: CLM UPDATE START
+    global logHighlights
+
+    pattern = re.compile("^.*CLM UPDATE START")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*CLM UPDATE START', 'Channel Map update has started', match.group())
+        val = val.strip()
+
+        logStr = " : Recording failed : "
+        logIt("recFail_CLMstart" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recFail_CLMsuccess( line ):
+    #Jan 13 21:19:38 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050040: CLM UPDATE SUCCESS
+    global logHighlights
+
+    pattern = re.compile("^.*CLM UPDATE SUCCESS")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*CLM UPDATE SUCCESS', 'Channel Map update successful', match.group())
+        val = val.strip()
+
+        logStr = " : Recording failed : "
+        logIt("recFail_CLMsuccess" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 parsers = [
         keyPressParser,
         boxTypeParser,
@@ -322,8 +406,12 @@ parsers = [
         uiLoadedParser,
         bfsInitDoneParser,
         bfsDnldCrashParser,
+        bfsBrokenPipeParser,
         ipAddressParser,
-        macAddressParser
+        macAddressParser,
+        recFail_lowDiskSpaceParser,
+        recFail_CLMstart,
+        recFail_CLMsuccess
         ]
 
 def lineParser( line ):
@@ -342,7 +430,7 @@ try:
     inFile = sys.argv[1]
     f = open(inFile, "r")
 except:
-    logIt("ERR: invalid use", LB_N, FORCE)
+    logIt("ERR: invalid use", LB_Y, FORCE)
     usageInfo()
     quit()
 

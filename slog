@@ -20,3 +20,7 @@ Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 49 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 49 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 53 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 53 --
+Jan 20 12:28:14 powertv csp_CPERP: DLOG|BFS_GET_MODULE|ERROR|bool CSCI_BFS_API::ActiveContext::_serializeAndSendPacket(int, BfsIpc::PacketBuilder&) - 222 Error sending eIpc_BeginDownload packet to BFS server - send /tmp/bfs_server error Broken pipe
+Jan 25 06:00:04 powertv csp_CPERP: DLOG|DVR|Recording Failure|TimerHandler: Failure not enough disk space to record Breakfast Television AID 113
+Jan 13 21:19:16 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050030: CLM UPDATE START
+Jan 13 21:19:38 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050040: CLM UPDATE SUCCESS
