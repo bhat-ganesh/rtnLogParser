@@ -63,6 +63,7 @@ keyMap = {
 counter = 0
 keyCounter = 0
 keySignalIgnore = 0
+initialKeyCode = 0
 logSearchInfo = "_rtnLogParser_"
 logHighlights = ""
 loggingMode = ""
@@ -107,41 +108,47 @@ def usageInfo():
     logIt("*************************************", LB_N, FORCE)
     return
 
+def dateTimeParser( line ):
+    dateTimePattern = re.compile("... .. ..:..:..")
+    matchDateTime = re.search(dateTimePattern, line)
+    dateTime = matchDateTime.group()
+    # logIt("dateTimeParser: " + dateTime, LB_N, VERBOSE)
+    return dateTime
+
 def keyPressParser( line ):
     global counter
     global keyCounter
     global logHighlights
     global keySignalIgnore
+    global initialKeyCode
     
-    keyPressPattern = re.compile("^.*\|.key.*: .*$")
-    keyTimePattern = re.compile("... .. ..:..:..")
-
+    keyPressPattern = re.compile("^.*\| -- sending key .* --$")
     matchKeyPress = re.search(keyPressPattern, line)
+
     if matchKeyPress:
-        if keySignalIgnore :
+        keyCode = re.sub(' --', '', re.sub('^.*\| -- sending key ', '', matchKeyPress.group()))
+        keyCode = keyCode.strip()
+        
+        if (keySignalIgnore and (initialKeyCode == keyCode)):
             logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
             keySignalIgnore = 0;
+            initialKeyCode = 0;
             return True
         
-        keySignalIgnore = 1
-        counter = counter+1
+        counter = counter + 1
         keyCounter = keyCounter + 1
-        
-        keyCode = re.sub('^.*\|.key.*: ', '',matchKeyPress.group())
-        keyCode = keyCode.strip()
+        keySignalIgnore = 1
+        initialKeyCode = keyCode
+
         try:
             keyName = keyMap[keyCode];
         except:
             keyName = keyCode
         
         logIt("keyPressParser: key press found = " + keyName, LB_Y, VERBOSE)
-
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + keyName + "\n"
-
-        matchKeyTime = re.search(keyTimePattern, line)
-        keyTime = matchKeyTime.group()
-        logHighlights += "line" + str(lineCount+1) + " : " + keyTime + " : " + keyName + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + " : key " + keyName + "\n"
         return True
     return False
 
