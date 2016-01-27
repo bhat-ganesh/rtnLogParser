@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 import sys
 import re
@@ -399,6 +400,144 @@ def recFail_CLMsuccess( line ):
 
 #.............................................................................#
 
+def recDel_lowDiskSpaceParser( line ):
+    #Dec 29 10:09:33 powertv syslog: DLOG|DVR|Recording Failure|FDR_log: DVRTXN080030: 1006|Liberty's Kids|17|1450921500|RECORDING DELETED:DISK SPACE CRITICAL 95%
+    global logHighlights
+
+    pattern = re.compile("^.*RECORDING DELETED:DISK SPACE CRITICAL .*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*RECORDING DELETED:DISK SPACE CRITICAL', 'disk space critical', match.group())
+        val = val.strip()
+
+        logStr = " : Recording deleted : "
+        logIt("recDel_lowDiskSpaceParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recNotPlayableParser( line ):
+    #Dec 22 16:14:53 powertv syslog: DLOG|MSP_DVR|ERROR|RecSession:stopConvert:808 RecordSessionStateError: Error Bad state: 3
+    global logHighlights
+
+    pattern = re.compile("^.*RecordSessionStateError: Error Bad state: 3$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*RecordSessionStateError:', '', match.group())
+        val = val.strip()
+
+        logStr = " : Recording not playable : "
+        logIt("recNotPlayableParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def blackScreen_Err19Parser( line ):
+    #Jan 11 09:26:29 powertv csp_CPERP: DLOG|MSP_MPLAYER|ERROR|DisplaySession:stop:1352 cpe_media_Stop error -19
+    global logHighlights
+
+    pattern = re.compile("^.*cpe_media_Stop error -19$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*cpe_media_Stop error -19', 'cpe_media_Stop error -19', match.group())
+        val = val.strip()
+
+        logStr = " : CSCup37738 Black Screen on all channels : due to "
+        logIt("blackScreen_Err19Parser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def blackScreen_vodStreamIssueParser( line ):
+    #Dec 21 15:35:08 powertv csp_CPERP: DLOG|MSP_MPLAYER|ERROR|Zapper:handleEvent:225 PsiTimeOutError: Warning - PSI not available. DoCallback – ContentNotFound!!
+    global logHighlights
+
+    pattern = re.compile("^.*PSI not available.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : VOD playback black screen : due to stream issue"
+        logIt("blackScreen_vodStreamIssueParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def blackScreen_signalStreamIssueParser( line ):
+    #Dec 20 03:50:21 powertv csp_CPERP: DLOG|MSP_MPLAYER|EMERGENCY|Zapper:handleEvent:220 Warning - Tuner lock timeout.May be signal strength is low or no stream on tuned frequency!!
+    global logHighlights
+
+    pattern = re.compile("^.*signal strength is low or no stream.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Black screen : stream issue - low signal or no stream"
+        logIt("blackScreen_signalStreamIssueParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def blackScreen_patTimeoutParser( line ):
+    #Dec 11 15:36:10 powertv syslog: DLOG|MSP_PSI|ERROR|Psi:dispatchEvent:125 PsiTimeOutError: Time out while waiting for PAT
+    global logHighlights
+
+    pattern = re.compile("^.*PsiTimeOutError: Time out while waiting for PAT$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Black screen : PAT timeout"
+        logIt("blackScreen_patTimeoutParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+def stuck04Parser( line ):
+    #Dec 31 19:01:37 powertv csp_CPERP: DLOG|SAM|ERROR|Thread Setname Failed:threadRetValue:0
+    global logHighlights
+
+    pattern = re.compile("^.*SAM.*Thread Setname Failed.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Stuck at -04- : due to SAM not ready "
+        logIt("stuck04Parser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 parsers = [
         keyPressParser,
         boxTypeParser,
@@ -411,7 +550,14 @@ parsers = [
         macAddressParser,
         recFail_lowDiskSpaceParser,
         recFail_CLMstart,
-        recFail_CLMsuccess
+        recFail_CLMsuccess,
+        recDel_lowDiskSpaceParser,
+        recNotPlayableParser,
+        blackScreen_Err19Parser,
+        blackScreen_vodStreamIssueParser,
+        blackScreen_signalStreamIssueParser,
+        blackScreen_patTimeoutParser,
+        stuck04Parser
         ]
 
 def lineParser( line ):
