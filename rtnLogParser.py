@@ -7,6 +7,19 @@ import re
 
 # globals
 
+NORMAL = "normal"
+VERBOSE = "verbose"
+FORCE = "force"
+
+LB_Y = "line break yes"
+LB_N = "line break no"
+
+loggingMode = ""
+logHighlights = ""
+logSearchInfo = "_rtnLogParser_"
+
+keyCounter = 0
+keyCode = 0
 keyMap = {
     '48' : '0',
     '49' : '1',
@@ -60,24 +73,13 @@ keyMap = {
     '1073742361' : 'day-'
 }
 
-boxType = {
+boxType = ""
+boxTypeMap = {
     '9k'  : 'G8 9K',
     '8k'  : 'G6 8K',
     '4k'  : 'G6 4K',
     '10k' : 'G10 10K'
 }
-
-keyCounter = 0
-keySignalIgnore = 0
-initialKeyCode = 0
-logSearchInfo = "_rtnLogParser_"
-logHighlights = ""
-loggingMode = ""
-NORMAL = "normal"
-VERBOSE = "verbose"
-FORCE = "force"
-LB_Y = "line break yes"
-LB_N = "line break no"
 
 #-----------------------------------------------------------------------------#
 
@@ -128,10 +130,10 @@ def dateTimeParser( line ):
 #.............................................................................#
 
 def keyPressParser( line ):
+    #Jan 27 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --
     global logHighlights
     global keyCounter
-    global keySignalIgnore
-    global initialKeyCode
+    global keyCode
     
     pattern = re.compile("^.*\| -- sending key .* --$")
     match = re.search(pattern, line)
@@ -140,32 +142,31 @@ def keyPressParser( line ):
         val = re.sub(' --', '', re.sub('^.*\| -- sending key ', '', match.group()))
         val = val.strip()
         
-        if (keySignalIgnore and (initialKeyCode == val)):
-            logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
-            keySignalIgnore = 0;
-            initialKeyCode = 0;
-            return True
-        
-        keyCounter = keyCounter + 1
-        keySignalIgnore = 1
-        initialKeyCode = val
-
         try:
             val = keyMap[val]
         except:
             val = val
         
-        logIt("keyPressParser: key press found = " + val, LB_N, VERBOSE)
+        if (keyCode == val):
+            logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
+            return True
+        
+        keyCode = val
+        logStr = " : Key Press : "
+        keyCounter = keyCounter + 1
+        logIt("keyPressParser" + logStr + val, LB_N, VERBOSE)
         line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + " : Key Pressed : " + val + "\n"
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
 #.............................................................................#
 
 def boxTypeParser( line ):
+    #Image created for 9k box.
     global logHighlights
+    global boxType
 
     pattern = re.compile("^Image created for .* box.*$")
     match = re.search(pattern, line)
@@ -173,18 +174,23 @@ def boxTypeParser( line ):
     if match:
         val = re.sub( ' box.*$', '', re.sub('^Image created for ', '', match.group()))
         val = val.strip()
-        
+
         try:
-            val = boxType[val]
+            val = boxTypeMap[val]
         except:
             val = val
 
-        logIt("boxTypeParser: box type = " + val, LB_Y, VERBOSE)
+        if (boxType == val):
+            logIt("boxTypeParser: data already parsed, ignoring", LB_Y, VERBOSE)
+            return True
+        
+        boxType = val
+        logStr = " : Box Type : "
+        logIt("boxTypeParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo +" box type = " + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : Box Type : " + val + "\n"
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + logStr + val + "\n"
         return True
-
     return False
 
 #.............................................................................#
