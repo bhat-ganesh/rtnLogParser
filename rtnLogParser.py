@@ -60,7 +60,13 @@ keyMap = {
     '1073742361' : 'day-'
 }
 
-counter = 0
+boxType = {
+    '9k'  : 'G8 9K',
+    '8k'  : 'G6 8K',
+    '4k'  : 'G6 4K',
+    '10k' : 'G10 10K'
+}
+
 keyCounter = 0
 keySignalIgnore = 0
 initialKeyCode = 0
@@ -122,45 +128,63 @@ def dateTimeParser( line ):
 #.............................................................................#
 
 def keyPressParser( line ):
-    global counter
-    global keyCounter
     global logHighlights
+    global keyCounter
     global keySignalIgnore
     global initialKeyCode
     
-    keyPressPattern = re.compile("^.*\| -- sending key .* --$")
-    matchKeyPress = re.search(keyPressPattern, line)
+    pattern = re.compile("^.*\| -- sending key .* --$")
+    match = re.search(pattern, line)
 
-    if matchKeyPress:
-        keyCode = re.sub(' --', '', re.sub('^.*\| -- sending key ', '', matchKeyPress.group()))
-        keyCode = keyCode.strip()
+    if match:
+        val = re.sub(' --', '', re.sub('^.*\| -- sending key ', '', match.group()))
+        val = val.strip()
         
-        if (keySignalIgnore and (initialKeyCode == keyCode)):
+        if (keySignalIgnore and (initialKeyCode == val)):
             logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
             keySignalIgnore = 0;
             initialKeyCode = 0;
             return True
         
-        counter = counter + 1
         keyCounter = keyCounter + 1
         keySignalIgnore = 1
-        initialKeyCode = keyCode
+        initialKeyCode = val
 
         try:
-            keyName = keyMap[keyCode];
+            val = keyMap[val]
         except:
-            keyName = keyCode
+            val = val
         
-        logIt("keyPressParser: key press found = " + keyName, LB_N, VERBOSE)
+        logIt("keyPressParser: key press found = " + val, LB_N, VERBOSE)
         line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + keyName + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + " : key " + keyName + "\n"
+        contents[lineCount] = line + " " + logSearchInfo +" KEY_PRESS = " + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + " : Key Pressed : " + val + "\n"
         return True
     return False
 
 #.............................................................................#
 
 def boxTypeParser( line ):
+    global logHighlights
+
+    pattern = re.compile("^Image created for .* box.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( ' box.*$', '', re.sub('^Image created for ', '', match.group()))
+        val = val.strip()
+        
+        try:
+            val = boxType[val]
+        except:
+            val = val
+
+        logIt("boxTypeParser: box type = " + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo +" box type = " + val + "\n"
+        logHighlights += "line" + str(lineCount+1) + " : Box Type : " + val + "\n"
+        return True
+
     return False
 
 #.............................................................................#
@@ -233,7 +257,7 @@ with open(sys.argv[1], 'r') as file:
 
 # post process
 
-if counter:
+if logHighlights:
     outFile = inFile+"_changed"
     f = open(outFile, "w")
     contents = "".join(contents)
@@ -243,10 +267,10 @@ if counter:
     logIt(inFile + " processed successfully.", LB_N)
     logIt("Following are highlights in " + inFile + ":")
     
-    logIt("**************************************", LB_N)
+    logIt("************************************************", LB_N)
     logIt("Total number of key presses = " + str(keyCounter))
     logIt(logHighlights.strip(),0)
-    logIt("**************************************")
+    logIt("************************************************")
     
     logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
     logIt("Look for " + logSearchInfo + " in " + outFile)

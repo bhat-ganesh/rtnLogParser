@@ -1,5 +1,6 @@
-Apr 10 14:55:35 |NORMAL|+key: 0x40000087 
+Image created for 9k box.
 Apr 10 14:55:35 |NORMAL|-key: 0x40000087
+Apr 10 14:55:35 |NORMAL|+key: 0x40000087 
 Apr 10 14:55:36 |NORMAL|+keyup: 0x40000087
 Apr 10 14:55:36 |NORMAL|+keyup: 0x40000087
 Apr 10 14:55:36 |NORMAL|
@@ -21,4 +22,3 @@ Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 49 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 49 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 53 --
 Jan 25 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 53 --
-
