@@ -142,7 +142,7 @@ def keyPressParser( line ):
     global keyCounter
     global keyCode
     
-    pattern = re.compile("^.*\| -- sending key .* --$")
+    pattern = re.compile("^.*\| -- sending key .* --.*$")
     match = re.search(pattern, line)
 
     if match:
@@ -214,7 +214,7 @@ def bfsInitDoneParser( line ):
     global logHighlights
     global bfsInit
 
-    pattern = re.compile("^.*\|BFS Init Done!$")
+    pattern = re.compile("^.*\|BFS Init Done!.*$")
     match = re.search(pattern, line)
     
     if match:
@@ -240,7 +240,7 @@ def bfsDnldCrashParser( line ):
     #Jan 27 11:23:28 powertv syslog: DLOG|BFS_GET_MODULE|EMERGENCY|get_filter_setting_for_module - 625 assertion failed
     global logHighlights
 
-    pattern = re.compile("^.* - 625 assertion failed$")
+    pattern = re.compile("^.* - 625 assertion failed.*$")
     match = re.search(pattern, line)
     
     if match:
@@ -616,6 +616,51 @@ def bootUpSequenceParser( line ):
 
 #.............................................................................#
 
+def network2WayReadyParser( line ):
+    #Jan 28 12:21:13 powertv syslog: DLOG|SPM_VODCTLG|ERROR|vod-internal.cpp:void* tr_VodInit(void*):959: Network is two way and System is Ready
+    global logHighlights
+
+    pattern = re.compile("^.*Network is two way and System is Ready.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Network is two way and System is Ready"
+        logIt("network2WayReadyParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def maintSequenceParser( line ):
+    # Jan 28 12:22:01 powertv syslog: DLOG|DLM|EMERGENCY|[sendSailMessage][1517] dlmWarningType:MAINT_DOWNLOAD_WARNING
+    # Jan 28 12:22:21 powertv syslog: DLOG|DLM|EMERGENCY|[sendSailMessage][1517] dlmWarningType:MAINT_DOWNLOAD_REQUEST
+    # Jan 28 12:23:00 powertv syslog: DLOG|DLM|EMERGENCY|[sendSailMessage][1517] dlmWarningType:MAINT_DOWNLOAD_COMPLETE
+    global logHighlights
+
+    pattern = re.compile("^.*MAINT_DOWNLOAD_.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*MAINT_DOWNLOAD_', '', match.group())
+        val = val.strip()
+        
+        logStr = " : maintenance download "
+        logIt("maintSequenceParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+
+
+
 parsers = [
         keyPressParser,
         boxTypeParser,
@@ -638,7 +683,9 @@ parsers = [
         noAuthECMParser,
         channelNAParser,
         uiErrLoadingParser,
-        bootUpSequenceParser
+        bootUpSequenceParser,
+        network2WayReadyParser,
+        maintSequenceParser
         ]
 
 def lineParser( line ):
