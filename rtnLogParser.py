@@ -265,10 +265,8 @@ def bfsBrokenPipeParser( line ):
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub('^.*BFS.* error Broken pipe$', 'UI not available due to BFS error broken pipe', match.group())
-        val = val.strip()
-
-        logStr = " : "
+        val = ""
+        logStr = " : BFS error broken pipe "
         logIt("bfsBrokenPipeParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -332,82 +330,28 @@ def macAddressParser( line ):
 
 #.............................................................................#
 
-def recFail_lowDiskSpaceParser( line ):
+def recordingFailureParser( line ):
+    #Dec 29 10:09:33 powertv syslog: DLOG|DVR|Recording Failure|FDR_log: DVRTXN080030: 1006|Liberty's Kids|17|1450921500|RECORDING DELETED:DISK SPACE CRITICAL 95%
     #Jan 25 06:00:04 powertv csp_CPERP: DLOG|DVR|Recording Failure|TimerHandler: Failure not enough disk space to record Breakfast Television AID 113
-    global logHighlights
-
-    pattern = re.compile("^.*Failure not enough disk space to record.*$")
-    match = re.search(pattern, line)
-    
-    if match:
-        val = re.sub('^.*Failure not enough disk space to record.*$', 'not enough disk space to record', match.group())
-        val = val.strip()
-
-        logStr = " : Recording failed : "
-        logIt("recFail_lowDiskSpaceParser" + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
-        return True
-    return False
-
-#.............................................................................#
-
-def recFail_CLMstart( line ):
     #Jan 13 21:19:16 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050030: CLM UPDATE START
-    global logHighlights
-
-    pattern = re.compile("^.*CLM UPDATE START")
-    match = re.search(pattern, line)
-    
-    if match:
-        val = re.sub('^.*CLM UPDATE START', 'Channel Map update has started', match.group())
-        val = val.strip()
-
-        logStr = " : Recording failed : "
-        logIt("recFail_CLMstart" + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
-        return True
-    return False
-
-#.............................................................................#
-
-def recFail_CLMsuccess( line ):
     #Jan 13 21:19:38 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050040: CLM UPDATE SUCCESS
     global logHighlights
 
-    pattern = re.compile("^.*CLM UPDATE SUCCESS")
-    match = re.search(pattern, line)
-    
-    if match:
-        val = re.sub('^.*CLM UPDATE SUCCESS', 'Channel Map update successful', match.group())
-        val = val.strip()
-
-        logStr = " : Recording failed : "
-        logIt("recFail_CLMsuccess" + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
-        return True
-    return False
-
-#.............................................................................#
-
-def recDel_lowDiskSpaceParser( line ):
-    #Dec 29 10:09:33 powertv syslog: DLOG|DVR|Recording Failure|FDR_log: DVRTXN080030: 1006|Liberty's Kids|17|1450921500|RECORDING DELETED:DISK SPACE CRITICAL 95%
-    global logHighlights
-
-    pattern = re.compile("^.*RECORDING DELETED:DISK SPACE CRITICAL .*$")
+    pattern = re.compile("^.*Recording Failure.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('^.*RECORDING DELETED:DISK SPACE CRITICAL', 'disk space critical', match.group())
+        if (val == match.group()):
+            val = re.sub('^.*Failure not', 'not', match.group())
+            if (val == match.group()):
+                val = re.sub('^.*CLM UPDATE START', 'Channel Map update has started', match.group())
+                if (val == match.group()):
+                    val = re.sub('^.*CLM UPDATE SUCCESS', 'Channel Map update successful', match.group())
         val = val.strip()
-
-        logStr = " : Recording deleted : "
-        logIt("recDel_lowDiskSpaceParser" + logStr + val, LB_Y, VERBOSE)
+        
+        logStr = " : Recording failed : "
+        logIt("recordingFailureParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -424,10 +368,8 @@ def recNotPlayable_BadStateParser( line ):
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub('^.*RecordSessionStateError:', '', match.group())
-        val = val.strip()
-
-        logStr = " : Recording not playable : "
+        val = ""
+        logStr = " : Recording not playable : Error Bad state: 3"
         logIt("recNotPlayable_BadStateParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -464,10 +406,8 @@ def blackScreen_Err19Parser( line ):
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub('^.*cpe_media_Stop error -19', 'cpe_media_Stop2yy error -19', match.group())
-        val = val.strip()
-
-        logStr = " : CSCup37738 Black Screen on all channels : due to "
+        val = ""
+        logStr = " : CSCup37738 Black Screen on all channels : due to cpe_media_Stop2 error -19"
         logIt("blackScreen_Err19Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -685,10 +625,7 @@ parsers = [
         bfsBrokenPipeParser,
         ipAddressParser,
         macAddressParser,
-        recFail_lowDiskSpaceParser,
-        recFail_CLMstart,
-        recFail_CLMsuccess,
-        recDel_lowDiskSpaceParser,
+        recordingFailureParser,
         recNotPlayable_BadStateParser,
         recNotPlayable_deAuthParser,
         blackScreen_Err19Parser,
