@@ -164,7 +164,7 @@ def keyPressParser( line ):
         logIt("keyPressParser" + logStr + val, LB_N, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -196,7 +196,7 @@ def boxTypeParser( line ):
         logIt("boxTypeParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + logStr + val + "\n"
         return True
     return False
 
@@ -205,13 +205,6 @@ def boxTypeParser( line ):
 def buildInfoParser( line ):
     
 
-    return False
-
-#.............................................................................#
-
-def uiLoadedParser( line ):
-    
-    
     return False
 
 #.............................................................................#
@@ -237,7 +230,7 @@ def bfsInitDoneParser( line ):
         logIt("bfsInitDoneParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -258,11 +251,12 @@ def bfsDnldCrashParser( line ):
         logIt("bfsDnldCrashParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
 #.............................................................................#
+
 def bfsBrokenPipeParser( line ):
     #Jan 20 12:28:14 powertv csp_CPERP: DLOG|BFS_GET_MODULE|ERROR|bool CSCI_BFS_API::ActiveContext::_serializeAndSendPacket(int, BfsIpc::PacketBuilder&) - 222 Error sending eIpc_BeginDownload packet to BFS server - send /tmp/bfs_server error Broken pipe
     global logHighlights
@@ -278,9 +272,10 @@ def bfsBrokenPipeParser( line ):
         logIt("bfsBrokenPipeParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
+
 #.............................................................................#
 
 def ipAddressParser( line ):
@@ -304,7 +299,7 @@ def ipAddressParser( line ):
         logIt("ipAddressParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -331,7 +326,7 @@ def macAddressParser( line ):
         logIt("macAddressParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + logStr + val + "\n"
         return True
     return False
 
@@ -352,7 +347,7 @@ def recFail_lowDiskSpaceParser( line ):
         logIt("recFail_lowDiskSpaceParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -373,7 +368,7 @@ def recFail_CLMstart( line ):
         logIt("recFail_CLMstart" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -394,7 +389,7 @@ def recFail_CLMsuccess( line ):
         logIt("recFail_CLMsuccess" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -415,7 +410,7 @@ def recDel_lowDiskSpaceParser( line ):
         logIt("recDel_lowDiskSpaceParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -436,7 +431,7 @@ def recNotPlayable_BadStateParser( line ):
         logIt("recNotPlayable_BadStateParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -455,7 +450,7 @@ def recNotPlayable_deAuthParser( line ):
         logIt("recNotPlayable_deAuthParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -476,7 +471,7 @@ def blackScreen_Err19Parser( line ):
         logIt("blackScreen_Err19Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -495,7 +490,7 @@ def blackScreen_vodStreamIssueParser( line ):
         logIt("blackScreen_vodStreamIssueParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -514,7 +509,7 @@ def blackScreen_signalStreamIssueParser( line ):
         logIt("blackScreen_signalStreamIssueParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -533,7 +528,7 @@ def blackScreen_patTimeoutParser( line ):
         logIt("blackScreen_patTimeoutParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -552,7 +547,7 @@ def blackScreen_pmtNoInfoParser( line ):
         logIt("blackScreen_pmtNoInfoParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -571,7 +566,7 @@ def stuck04Parser( line ):
         logIt("stuck04Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -590,7 +585,7 @@ def serviceDeAuthParser( line ):
         logIt("serviceDeAuthParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -609,7 +604,7 @@ def noAuthECMParser( line ):
         logIt("noAuthECMParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -628,7 +623,7 @@ def channelNAParser( line ):
         logIt("channelNAParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -647,7 +642,7 @@ def uiErrLoadingParser( line ):
         logIt("uiErrLoadingParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -675,7 +670,7 @@ def bootUpSequenceParser( line ):
         logIt("bootUpSequenceParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line" + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -685,7 +680,6 @@ parsers = [
         keyPressParser,
         boxTypeParser,
         buildInfoParser,
-        uiLoadedParser,
         bfsInitDoneParser,
         bfsDnldCrashParser,
         bfsBrokenPipeParser,
