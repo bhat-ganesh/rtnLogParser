@@ -658,8 +658,66 @@ def maintSequenceParser( line ):
 
 #.............................................................................#
 
+def vodSessionSetUpFailureParser( line ):
+    #Jan 28 14:41:31 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|SeaChange_SessCntrl:HandleSessionConfirmResp:915 WARNING - SERVER NOT READY - Invalid DSMCC response received : 6 !!
+    global logHighlights
 
+    pattern = re.compile("^.*SERVER NOT READY - Invalid DSMCC response.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : vod session setup failed as vod server was not ready"
+        logIt("vodSessionSetUpFailureParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
 
+#.............................................................................#
+
+def tunedProgramParser( line ):
+    #Jan 28 14:46:11 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/gadget_baseinfo.js at line 99 In base info update      Programme Name is : General Hosp. : CHANNEL NUMBER : 7
+    global logHighlights
+
+    pattern = re.compile("^.*gadget_baseinfo.* Programme Name is.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub(':.*$', '', re.sub('^.*gadget_baseinfo.* Programme Name is : ', '', match.group()))
+        val = val.strip()
+
+        logStr = " : Tuned to program : "
+        logIt("tunedProgramParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def tunedChannelParser( line ):
+    #Jan 28 14:46:11 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/gadget_baseinfo.js at line 340 RTNUI : gadget_baseinfo : reallyUpdate : 7 <span>CITYT</span>
+    global logHighlights
+
+    pattern = re.compile("^.*gadget_baseinfo : reallyUpdate .*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('<\/?span>', '', re.sub('^.*gadget_baseinfo : reallyUpdate : ', '', match.group()))
+        val = val.strip()
+        
+        logStr = " : Tuned to channel : "
+        logIt("tunedChannelParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
 
 parsers = [
         keyPressParser,
@@ -685,8 +743,15 @@ parsers = [
         uiErrLoadingParser,
         bootUpSequenceParser,
         network2WayReadyParser,
-        maintSequenceParser
+        maintSequenceParser,
+        vodSessionSetUpFailureParser,
+        tunedProgramParser,
+        tunedChannelParser
         ]
+
+# vod/recording played
+# stop rew fwd pause
+# recording set delete
 
 def lineParser( line ):
     for parser in parsers:
