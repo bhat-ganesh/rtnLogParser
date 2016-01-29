@@ -120,3 +120,20 @@ Jan 29 11:23:27 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):H
 Jan 29 11:27:56 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-300 Den:10 Speed:-3000.000000 #####
 Jan 29 11:28:00 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-600 Den:10 Speed:-6000.000000 #####
 Jan 29 11:28:03 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:1 Den:1 Speed:100.000000 #####
+
+Jan 29 12:54:18 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sctetv://022  session: 0x1c6f4f8     **SAIL API**
+
+Jan 29 13:00:53 powertv syslog: DLOG|GALIO|ERROR|package://5415C3E6-8DBEB1FC/js/zapp.js at line 2831 TypeError: Result of expression 'TVLib.Event.MOMMessage.VOD1080p' [undefined] is not an object.
+
+Sep 11 15:08:44 powertv root: SCRIPT: unhandled exception: Attempt to convert null or undefined value recording to Object
+Sep 11 19:08:52 powertv root: SCRIPT: unhandled exception: SETTINGS.CheckboxPane() is not defined 
+
+Jan 29 13:02:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_PersistentRecord:685 sess: 0x3ab3ee0  recordUrl: sadvr://dElWnhPo  start: 0.000000   stop: -2.000000    **SAIL API**
+Jan 29 13:04:28 powertv syslog: DLOG|MSP_MRDVR|ERROR|MRDvrServer:Csci_Msp_MrdvrSrv_NotifyRecordingStop:112 URL is : sctetv://003
+Jan 29 13:05:15 powertv syslog: DLOG|DVRUTIL|ERROR|Successfully Deleted file /mnt/dvr0/vNA4T1Rn
+Jan 29 13:11:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sadvr://mnt/dvr0/6oxGuu4M  session: 0x1b0a978     **SAIL API**
+
+
+
+
+

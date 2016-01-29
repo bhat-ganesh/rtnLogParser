@@ -324,6 +324,82 @@ def macAddressParser( line ):
 
 #.............................................................................#
 
+def recordingStartedParser( line ):
+    # Jan 29 13:02:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_PersistentRecord:685 sess: 0x3ab3ee0  recordUrl: sadvr://dElWnhPo  start: 0.000000   stop: -2.000000    **SAIL API**
+    global logHighlights
+
+    pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_PersistentRecord.*recordUrl.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : recording started"
+        logIt("recordingStartedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recordingStoppedParser( line ):
+    # Jan 29 13:04:28 powertv syslog: DLOG|MSP_MRDVR|ERROR|MRDvrServer:Csci_Msp_MrdvrSrv_NotifyRecordingStop:112 URL is : sctetv://003
+    global logHighlights
+
+    pattern = re.compile("^.*Csci_Msp_MrdvrSrv_NotifyRecordingStop.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : recording stopped"
+        logIt("recordingStoppedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recordingDeletedParser( line ):
+    # Jan 29 13:05:15 powertv syslog: DLOG|DVRUTIL|ERROR|Successfully Deleted file /mnt/dvr0/vNA4T1Rn
+    global logHighlights
+
+    pattern = re.compile("^.*DVRUTIL.*Successfully Deleted file.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : recording deleted"
+        logIt("recordingDeletedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recordingPlaybackStartedParser( line ):
+    # Jan 29 13:11:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sadvr://mnt/dvr0/6oxGuu4M  session: 0x1b0a978     **SAIL API**
+    global logHighlights
+
+    pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*URL: sadvr:.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : recording playback started"
+        logIt("recordingPlaybackStartedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def recordingFailureParser( line ):
     #Dec 29 10:09:33 powertv syslog: DLOG|DVR|Recording Failure|FDR_log: DVRTXN080030: 1006|Liberty's Kids|17|1450921500|RECORDING DELETED:DISK SPACE CRITICAL 95%
     #Jan 25 06:00:04 powertv csp_CPERP: DLOG|DVR|Recording Failure|TimerHandler: Failure not enough disk space to record Breakfast Television AID 113
@@ -567,7 +643,7 @@ def uiErrLoadingParser( line ):
     #Nov 12 21:20:30 powertv bfsdnld: DLOG|BFS_GET_MODULE|ERROR|directory_update_timeout directory update taking more than 120 seconds
     global logHighlights
 
-    pattern = re.compile("^.*directory update taking more than 120 seconds$")
+    pattern = re.compile("^.*directory update taking more than 120 seconds.*$")
     match = re.search(pattern, line)
     
     if match:
@@ -581,6 +657,27 @@ def uiErrLoadingParser( line ):
     return False
 
 #.............................................................................#
+
+def uiExceptionParser( line ):
+    #Sep 11 15:08:44 powertv root: SCRIPT: unhandled exception: Attempt to convert null or undefined value recording to Object
+    #Sep 11 19:08:52 powertv root: SCRIPT: unhandled exception: SETTINGS.CheckboxPane() is not defined
+    global logHighlights
+
+    pattern = re.compile("^.*SCRIPT: unhandled exception.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : exception in rtnui !!!"
+        logIt("uiExceptionParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def notStagedParser( line ):
     #Jan 28 12:47:57 powertv syslog: DLOG|DNCS_SETTINGS|EMERGENCY|SetStagingstatus:94 isStagingDefsApplied: 0 isHubSpecficStagingDefsApplied: 1 isAddressableStaged: 0
     global logHighlights
@@ -717,7 +814,7 @@ def vodSessionTearDownParser( line ):
     
     if match:
         val = ""
-        logStr = " : vod session torn down. It is normal if vod playback was stopped"
+        logStr = " : vod session torn down. It's normal if vod playback was stopped"
         logIt("vodSessionTearDownParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -823,6 +920,27 @@ def tunedChannelParser( line ):
 
 #.............................................................................#
 
+def tunedChannelNumberParser( line ):
+    #Jan 29 12:54:18 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sctetv://022  session: 0x1c6f4f8     **SAIL API**
+    global logHighlights
+
+    pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*sctetv.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub(' session.*$', '', re.sub('^.*IMediaPlayer:IMediaPlayerSession_Load.*sctetv:\/\/', '', match.group()))
+        val = val.strip()
+        
+        logStr = " : Tuned to channel : "
+        logIt("tunedChannelNumberParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def docsisParser( line ):
     #Jan 28 12:20:36 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/config.js at line 2039 RTNUI : Communication mode has been updated to : docsis : new IP Address : 100.109.176.144
     global logHighlights
@@ -851,6 +969,10 @@ parsers = [
         bfsBrokenPipeParser,
         ipAddressParser,
         macAddressParser,
+        recordingStartedParser,
+        recordingStoppedParser,
+        recordingDeletedParser,
+        recordingPlaybackStartedParser,
         recordingFailureParser,
         recNotPlayable_BadStateParser,
         recNotPlayable_deAuthParser,
@@ -864,6 +986,7 @@ parsers = [
         noAuthECMParser,
         channelNAParser,
         uiErrLoadingParser,
+        uiExceptionParser,
         notStagedParser,
         bootUpSequenceParser,
         network2WayReadyParser,
@@ -875,6 +998,7 @@ parsers = [
         vodPlaybackParser,
         tunedProgramParser,
         tunedChannelParser,
+        tunedChannelNumberParser,
         docsisParser
         ]
 
