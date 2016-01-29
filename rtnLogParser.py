@@ -83,6 +83,17 @@ boxTypeMap = {
 
 bfsInit = ""
 
+vodPlaybackSpeedMap = {
+    '100.000000'    : 'normal speed = 1x',
+    '0.000000'      : 'paused speed = 0x',
+    '750.000000'    : 'fast forward speed = 7.5x',
+    '3000.000000'   : 'fast forward speed = 30x',
+    '6000.000000'   : 'fast forward speed = 60x',
+    '-750.000000'   : 'rewind speed = -7.5x',
+    '-3000.000000'  : 'rewind speed = -30x',
+    '-6000.000000'  : 'rewind speed = -60x'
+}
+
 #-----------------------------------------------------------------------------#
 
 # functions
@@ -390,7 +401,7 @@ def blackScreen_Err19Parser( line ):
     
     if match:
         val = ""
-        logStr = " : CSCup37738 Black Screen on all channels : due to cpe_media_Stop2 error -19"
+        logStr = " : Black Screen on all channels : due to cpe_media_Stop2 error -19 CSCup37738 "
         logIt("blackScreen_Err19Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -570,6 +581,24 @@ def uiErrLoadingParser( line ):
     return False
 
 #.............................................................................#
+def notStagedParser( line ):
+    #Jan 28 12:47:57 powertv syslog: DLOG|DNCS_SETTINGS|EMERGENCY|SetStagingstatus:94 isStagingDefsApplied: 0 isHubSpecficStagingDefsApplied: 1 isAddressableStaged: 0
+    global logHighlights
+
+    pattern = re.compile("^.*SetStagingstatus.* isStagingDefsApplied: 0.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Stuck on -05- after Factory Restore due to not staged CSCux18653/CSCuu47200"
+        logIt("notStagedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
 
 def bootUpSequenceParser( line ):
     #Dec 31 19:01:13 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling:      Application started => Waiting for SessInit : 49.64 seconds, total time: 91.46 seconds (BUFFERED)
@@ -650,8 +679,100 @@ def vodSessionSetUpFailureParser( line ):
     
     if match:
         val = ""
-        logStr = " : vod session setup failed as vod server was not ready"
+        logStr = " : vod session setup failed - vod server not ready"
         logIt("vodSessionSetUpFailureParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def vodSessionSetUpFailure2Parser( line ):
+    #Jan 29 10:55:23 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|VOD_SessCntl(TID:5470b340):ProcessTimeoutCallBack:415  NOT RECEIVED SERVER RESPONSE  - sending error to service layer !!
+    global logHighlights
+
+    pattern = re.compile("^.*VOD_SessCntl.* NOT RECEIVED SERVER RESPONSE.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : vod session setup failed - no response from vod server"
+        logIt("vodSessionSetUpFailure2Parser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def vodSessionTearDownParser( line ):
+    #Jan 29 10:38:33 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|StreamTearDown:122 Closing the socket[400]
+    global logHighlights
+
+    pattern = re.compile("^.*StreamTearDown.*Closing the socket.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : vod session torn down. It is normal if vod playback was stopped"
+        logIt("vodSessionTearDownParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def vodPlaybackInitParser( line ):
+    #Jan 29 10:53:52 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: lscp://AssetId=1135&AppId=524289&BillingId=0&PurchaseTime=1454082831&RemainingTime=85482&EndPos=5635&srmManufacturer=Seachange&streamerManufacturer=Seachange&connectMgrIp=0x4161e479&Title=ForestGumpMultiTrick3 - 60x  session: 0x1b143b0     **SAIL API**
+    global logHighlights
+
+    pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*AssetId.*Title.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( ' session.*$', '', re.sub('^.*IMediaPlayer:IMediaPlayerSession_Load.*AssetId.*Title=', '', match.group()))
+        val = val.strip()
+
+        logStr = " : vod playback of asset : "
+        logIt("vodPlaybackInitParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def vodPlaybackParser( line ):
+    # Jan 29 11:12:30 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:1 Den:1 Speed:100.000000 #####
+    # Jan 29 11:21:18 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:0 Den:0 Speed:0.000000 #####
+    # Jan 29 11:22:26 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:15 Den:2 Speed:750.000000 ####
+    # Jan 29 11:27:22 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:300 Den:10 Speed:3000.000000 #####
+    # Jan 29 11:27:26 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:600 Den:10 Speed:6000.000000 #####
+    # Jan 29 11:23:27 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-15 Den:2 Speed:-750.000000 #####
+    # Jan 29 11:27:56 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-300 Den:10 Speed:-3000.000000 #####
+    # Jan 29 11:28:00 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-600 Den:10 Speed:-6000.000000 #####
+    global logHighlights
+
+    pattern = re.compile("^.*OnDemand.*HandleCallback.*Speed:.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub(' ####.*$', '', re.sub('^.*OnDemand.*HandleCallback.*Speed:', '', match.group()))
+        val = val.strip()
+
+        try:
+            val = vodPlaybackSpeedMap[val]
+        except:
+            val = val
+
+        logStr = " : vod playback ongoing at "
+        logIt("vodPlaybackParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -743,10 +864,15 @@ parsers = [
         noAuthECMParser,
         channelNAParser,
         uiErrLoadingParser,
+        notStagedParser,
         bootUpSequenceParser,
         network2WayReadyParser,
         maintSequenceParser,
         vodSessionSetUpFailureParser,
+        vodSessionSetUpFailure2Parser,
+        vodSessionTearDownParser,
+        vodPlaybackInitParser,
+        vodPlaybackParser,
         tunedProgramParser,
         tunedChannelParser,
         docsisParser
@@ -756,6 +882,7 @@ parsers = [
 # stop rew fwd pause
 # recording set delete
 # mrdvr server or client
+# hdmi connect/disconnect
 
 def lineParser( line ):
     for parser in parsers:
