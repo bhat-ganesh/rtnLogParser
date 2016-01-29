@@ -19,7 +19,6 @@ loggingMode = ""
 logHighlights = ""
 logSearchInfo = "_rtnLogParser_"
 
-keyCounter = 0
 keyCode = 0
 keyMap = {
     '48' : '0',
@@ -83,8 +82,6 @@ boxTypeMap = {
 }
 
 bfsInit = ""
-ipAddress = ""
-macAddress = ""
 
 #-----------------------------------------------------------------------------#
 
@@ -139,7 +136,6 @@ def dateTimeParser( line ):
 def keyPressParser( line ):
     #Jan 27 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --
     global logHighlights
-    global keyCounter
     global keyCode
     
     pattern = re.compile("^.*\| -- sending key .* --.*$")
@@ -160,7 +156,6 @@ def keyPressParser( line ):
         
         keyCode = val
         logStr = " : Key Press : "
-        keyCounter = keyCounter + 1
         logIt("keyPressParser" + logStr + val, LB_N, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -277,22 +272,16 @@ def bfsBrokenPipeParser( line ):
 #.............................................................................#
 
 def ipAddressParser( line ):
-    #Jan 27 11:24:16 powertv syslog: DLOG|MDA|NORMAL|mda_network_get_string: IP address = 7.255.4.141
+    #Jan 28 12:20:13 powertv syslog: doc_StoreParameter: Host IPv4 address: 100.109.176.144.
     global logHighlights
-    global ipAddress
 
-    pattern = re.compile("^.*: IP address = .*$")
+    pattern = re.compile("^.*: Host IPv4 address: .*$")
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub('^.*: IP address = ', '', match.group())
+        val = re.sub('^.*: Host IPv4 address: ', '', match.group())
         val = val.strip()
 
-        if (ipAddress == val):
-            logIt("ipAddressParser: data already parsed, ignoring", LB_Y, VERBOSE)
-            return True
-        
-        ipAddress = val
         logStr = " : IP Address : "
         logIt("ipAddressParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
@@ -304,27 +293,21 @@ def ipAddressParser( line ):
 #.............................................................................#
 
 def macAddressParser( line ):
-    #Dec 31 19:00:52 powertv syslog: DLOG|SAILMSG|ERROR|MAC ADDRESS OF BOX is:84:8D:C7:6D:41:E0
+    #Jan 28 12:19:15 powertv syslog: DLOG|MDA|ERROR|mda_network_init:336: MAC address = 68:EE:96:6F:15:B8
     global logHighlights
-    global macAddress
 
-    pattern = re.compile("^.*MAC ADDRESS OF BOX is.*$")
+    pattern = re.compile("^.*mda_network_init.*MAC address = .*$")
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub('^.*MAC ADDRESS OF BOX is:', '', match.group())
+        val = re.sub('^.*mda_network_init.*MAC address = ', '', match.group())
         val = val.strip()
 
-        if (macAddress == val):
-            logIt("macAddressParser: data already parsed, ignoring", LB_Y, VERBOSE)
-            return True
-        
-        macAddress = val
         logStr = " : MAC Address : "
         logIt("macAddressParser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
         return True
     return False
 
@@ -719,6 +702,25 @@ def tunedChannelParser( line ):
 
 #.............................................................................#
 
+def docsisParser( line ):
+    #Jan 28 12:20:36 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/config.js at line 2039 RTNUI : Communication mode has been updated to : docsis : new IP Address : 100.109.176.144
+    global logHighlights
+
+    pattern = re.compile("^.*Communication mode has been updated to : docsis.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Communication mode has been updated to : docsis"
+        logIt("docsisParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 parsers = [
         keyPressParser,
         boxTypeParser,
@@ -746,12 +748,14 @@ parsers = [
         maintSequenceParser,
         vodSessionSetUpFailureParser,
         tunedProgramParser,
-        tunedChannelParser
+        tunedChannelParser,
+        docsisParser
         ]
 
 # vod/recording played
 # stop rew fwd pause
 # recording set delete
+# mrdvr server or client
 
 def lineParser( line ):
     for parser in parsers:
@@ -801,7 +805,6 @@ if logHighlights:
     logIt("Following are highlights in " + inFile + ":")
     
     logIt("************************************************", LB_N)
-    logIt("Total number of key presses = " + str(keyCounter))
     logIt(logHighlights.strip(),0)
     logIt("************************************************")
     
