@@ -343,6 +343,27 @@ def recordingStartedParser( line ):
 
 #.............................................................................#
 
+def recordingStarted2Parser( line ):
+    # Jan 29 15:10:30 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record added dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 0 state mom_recording_RECORDING rel @0396c668 Zooville]
+    global logHighlights
+
+    pattern = re.compile("^.*GALIO\|NORMAL.*record added.*_RECORDING.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( '].*$', '',re.sub('^.*GALIO\|NORMAL.*record added.*_RECORDING rel .* ', '', match.group()))
+        val = val.strip()
+
+        logStr = " : start recording program = "
+        logIt("recordingStarted2Parser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def recordingStoppedParser( line ):
     # Jan 29 13:04:28 powertv syslog: DLOG|MSP_MRDVR|ERROR|MRDvrServer:Csci_Msp_MrdvrSrv_NotifyRecordingStop:112 URL is : sctetv://003
     global logHighlights
@@ -354,6 +375,27 @@ def recordingStoppedParser( line ):
         val = ""
         logStr = " : recording stopped"
         logIt("recordingStoppedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def recordingStopped2Parser( line ):
+    # Jan 29 15:12:42 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record updated dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 1 state mom_recording_STOPPED rel <NULL> Zooville]
+    global logHighlights
+
+    pattern = re.compile("^.*GALIO\|NORMAL.*record updated.*_STOPPED.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record updated.*_STOPPED rel <NULL> ', '', match.group()))
+        val = val.strip()
+
+        logStr = " : recording to be stopped = "
+        logIt("recordingStopped2Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -381,6 +423,27 @@ def recordingDeletedParser( line ):
 
 #.............................................................................#
 
+def recordingDeleted2Parser( line ):
+    # Jan 29 15:19:06 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record deleted (state != mom_recording_RECORDING) dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 1 state mom_recording_STOPPED rel <NULL> Zooville]
+    global logHighlights
+
+    pattern = re.compile("^.*GALIO\|NORMAL.*record deleted.*_STOPPED.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record deleted.*_STOPPED rel <NULL> ', '', match.group()))
+        val = val.strip()
+        
+        logStr = " : recording to be deleted = "
+        logIt("recordingDeleted2Parser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def recordingPlaybackStartedParser( line ):
     # Jan 29 13:11:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sadvr://mnt/dvr0/6oxGuu4M  session: 0x1b0a978     **SAIL API**
     global logHighlights
@@ -392,6 +455,26 @@ def recordingPlaybackStartedParser( line ):
         val = ""
         logStr = " : recording playback started"
         logIt("recordingPlaybackStartedParser" + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+def recordingPlaybackStarted2Parser( line ):
+    # Jan 29 15:14:01 powertv syslog: DLOG|GALIO|NORMAL|package://5415C3E6-8DBEB1FC/js/zapp_modes.js at line 375 ZapperModeVideo::Connect is now Playing [object MOMScheduledRecording] : Name : dvr://recording/00000000-0000-0000-0000-00000000000000000641 : Zooville
+    global logHighlights
+
+    pattern = re.compile("^.*GALIO\|NORMAL.*Connect is now Playing.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.*GALIO\|NORMAL.*Connect is now Playing.*dvr.* : ', '', match.group())
+        val = val.strip()
+        
+        logStr = " : recording to be played = "
+        logIt("recordingPlaybackStarted2Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -970,9 +1053,13 @@ parsers = [
         ipAddressParser,
         macAddressParser,
         recordingStartedParser,
+        recordingStarted2Parser,
         recordingStoppedParser,
+        recordingStopped2Parser,
         recordingDeletedParser,
+        recordingDeleted2Parser,
         recordingPlaybackStartedParser,
+        recordingPlaybackStarted2Parser,
         recordingFailureParser,
         recNotPlayable_BadStateParser,
         recNotPlayable_deAuthParser,
@@ -1001,12 +1088,6 @@ parsers = [
         tunedChannelNumberParser,
         docsisParser
         ]
-
-# vod/recording played
-# stop rew fwd pause
-# recording set delete
-# mrdvr server or client
-# hdmi connect/disconnect
 
 def lineParser( line ):
     for parser in parsers:
