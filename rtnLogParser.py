@@ -396,7 +396,7 @@ def recordingStopped2Parser( line ):
         val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record updated.*_STOPPED rel <NULL> ', '', match.group()))
         val = val.strip()
 
-        logStr = " : recording to be stopped = "
+        logStr = " : recording stopped = "
         logIt("recordingStopped2Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -436,7 +436,7 @@ def recordingDeleted2Parser( line ):
         val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record deleted.*_STOPPED rel <NULL> ', '', match.group()))
         val = val.strip()
         
-        logStr = " : recording to be deleted = "
+        logStr = " : recording deleted = "
         logIt("recordingDeleted2Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -475,7 +475,7 @@ def recordingPlaybackStarted2Parser( line ):
         val = re.sub('^.*GALIO\|NORMAL.*Connect is now Playing.*dvr.* : ', '', match.group())
         val = val.strip()
         
-        logStr = " : recording to be played = "
+        logStr = " : recording playback started = "
         logIt("recordingPlaybackStarted2Parser" + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
