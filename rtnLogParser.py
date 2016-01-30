@@ -163,6 +163,7 @@ def keyPressParser( line ):
         
         if (keyCode == val):
             logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
+            keyCode = ""
             return True
         
         keyCode = val
@@ -344,14 +345,15 @@ def recordingStartedParser( line ):
 #.............................................................................#
 
 def recordingStarted2Parser( line ):
-    # Jan 29 15:10:30 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record added dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 0 state mom_recording_RECORDING rel @0396c668 Zooville]
+    #Jan 29 15:10:30 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record added dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 0 state mom_recording_RECORDING rel @0396c668 Zooville Zooo]
+    #Jan 27 11:24:56 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record added dvr://recording/00000000-0000-0000-0000-00000000000000000570 rec [@01a57220: dvr://recording/00000000-0000-0000-0000-00000000000000000570 play 1 state mom_recording_RECORDING rel @01a57ee0 The Price Is Right]
     global logHighlights
 
     pattern = re.compile("^.*GALIO\|NORMAL.*record added.*_RECORDING.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = re.sub( '].*$', '',re.sub('^.*GALIO\|NORMAL.*record added.*_RECORDING rel .* ', '', match.group()))
+        val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record added.*_RECORDING rel @........ ', '', match.group()))
         val = val.strip()
 
         logStr = " : start recording program = "
