@@ -113,16 +113,16 @@ def logIt(message, breakLine=LB_Y, displayLog=NORMAL):
 #.............................................................................#
 
 def usageInfo():
-    logIt("*****************************************************", LB_N, FORCE)
+    logIt("*******************************************************", LB_N, FORCE)
     logIt("                 RTN Log Parser", LB_N, FORCE)
-    logIt("-----------------------------------------------------", LB_N, FORCE)
+    logIt("-------------------------------------------------------", LB_N, FORCE)
     logIt("Usage:", LB_Y, FORCE)
-    logIt(sys.argv[0]+" logFile [logging]", LB_Y, FORCE)
+    logIt(sys.argv[0] + " logFile [logging]", LB_Y, FORCE)
     logIt("Example  : ./rtnLogParser.py slog", LB_Y, FORCE)
-    logIt("-----------------------------------------------------", LB_N, FORCE)
+    logIt("-------------------------------------------------------", LB_N, FORCE)
     logIt("Required argument:", LB_Y, FORCE)
     logIt("@logFile : <path>/<logFile>", LB_Y, FORCE)
-    logIt("-----------------------------------------------------", LB_N, FORCE)
+    logIt("-------------------------------------------------------", LB_N, FORCE)
     logIt("Optional argument:", LB_Y, FORCE)
     logIt("@logging : used for script debugging", LB_N, FORCE)
     logIt("         : Possible values = silent, normal, verbose", LB_N, FORCE)
@@ -130,7 +130,11 @@ def usageInfo():
     logIt("         : silent  : no logs", LB_N, FORCE)
     logIt("         : normal  : high level logs", LB_N, FORCE)
     logIt("         : verbose : function level logs", LB_Y, FORCE)
-    logIt("*****************************************************", LB_N, FORCE)
+    logIt("-------------------------------------------------------", LB_N, FORCE)
+    logIt("Output:", LB_Y, FORCE)
+    logIt(sys.argv[0] + " will output log highlights on console", LB_N, FORCE)
+    logIt("Look for "+ logSearchInfo + " in logFile_changed", LB_N, FORCE)
+    logIt("*******************************************************", LB_N, FORCE)
     return
 
 #.............................................................................#
@@ -487,7 +491,7 @@ def recordingPlaybackStarted2Parser( line ):
     # Jan 29 15:14:01 powertv syslog: DLOG|GALIO|NORMAL|package://5415C3E6-8DBEB1FC/js/zapp_modes.js at line 375 ZapperModeVideo::Connect is now Playing [object MOMScheduledRecording] : Name : dvr://recording/00000000-0000-0000-0000-00000000000000000641 : Zooville
     global logHighlights
 
-    pattern = re.compile("^.*GALIO\|NORMAL.*Connect is now Playing.*$")
+    pattern = re.compile("^.*GALIO\|NORMAL.*Connect is now Playing.*dvr.*$")
     match = re.search(pattern, line)
     
     if match:
@@ -930,6 +934,7 @@ def vodSessionTearDownParser( line ):
 
 def vodPlaybackInitParser( line ):
     #Jan 29 10:53:52 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: lscp://AssetId=1135&AppId=524289&BillingId=0&PurchaseTime=1454082831&RemainingTime=85482&EndPos=5635&srmManufacturer=Seachange&streamerManufacturer=Seachange&connectMgrIp=0x4161e479&Title=ForestGumpMultiTrick3 - 60x  session: 0x1b143b0     **SAIL API**
+    # Feb  1 16:36:47 powertv syslog: DLOG|GALIO|NORMAL|package://5415C3E6-9E841FCC/js/zapp_modes.js at line 375 ZapperModeVideo::Connect is now Playing [object MOMVODAsset] : Name : undefined : ForestGumpMultiTrick3 - 60x
     global logHighlights
 
     pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*AssetId.*Title.*$")
