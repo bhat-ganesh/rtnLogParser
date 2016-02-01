@@ -98,10 +98,10 @@ vodPlaybackSpeedMap = {
 
 # functions
 
-def logIt( message, breakLine=LB_Y, displayLog=NORMAL ):
+def logIt(message, breakLine=LB_Y, displayLog=NORMAL):
     global loggingMode
 
-    if ( (loggingMode == displayLog) or (loggingMode == VERBOSE) or (displayLog == FORCE) ):
+    if ((loggingMode == displayLog) or (loggingMode == VERBOSE) or (displayLog == FORCE)):
         if (displayLog == VERBOSE):
             message = "[VERBOSE] " + message
         if (breakLine == LB_Y):
@@ -139,7 +139,7 @@ def dateTimeParser( line ):
     dateTimePattern = re.compile("... .. ..:..:..")
     matchDateTime = re.search(dateTimePattern, line)
     dateTime = matchDateTime.group()
-    # logIt("dateTimeParser: " + dateTime, LB_N, VERBOSE)
+    # logIt("sys._getframe().f_code.co_name: " + dateTime, LB_N, VERBOSE)
     return dateTime
 
 #.............................................................................#
@@ -148,7 +148,7 @@ def keyPressParser( line ):
     #Jan 27 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --
     global logHighlights
     global keyCode
-    
+
     pattern = re.compile("^.*\| -- sending key .* --.*$")
     match = re.search(pattern, line)
 
@@ -162,13 +162,13 @@ def keyPressParser( line ):
             val = val
         
         if (keyCode == val):
-            logIt("keyPressParser: ignoring second key signal", LB_Y, VERBOSE)
+            logIt(sys._getframe().f_code.co_name + " : ignoring second key signal", LB_Y, VERBOSE)
             keyCode = ""
             return True
         
         keyCode = val
         logStr = " : Key Press : "
-        logIt("keyPressParser" + logStr + val, LB_N, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_N, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -195,12 +195,12 @@ def boxTypeParser( line ):
             val = val
 
         if (boxType == val):
-            logIt("boxTypeParser: data already parsed, ignoring", LB_Y, VERBOSE)
+            logIt(sys._getframe().f_code.co_name + ": data already parsed, ignoring", LB_Y, VERBOSE)
             return True
         
         boxType = val
         logStr = " : Box Type : "
-        logIt("boxTypeParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + logStr + val + "\n"
@@ -229,12 +229,12 @@ def bfsInitDoneParser( line ):
         val = val.strip()
 
         if (bfsInit == val):
-            logIt("bfsInitDoneParser: data already parsed, ignoring", LB_Y, VERBOSE)
+            logIt(sys._getframe().f_code.co_name + ": data already parsed, ignoring", LB_Y, VERBOSE)
             return True
         
         bfsInit = val
         logStr = " : "
-        logIt("bfsInitDoneParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -255,7 +255,7 @@ def bfsDnldCrashParser( line ):
         val = val.strip()
 
         logStr = " : BFS dnld crash CSCux30595 : "
-        logIt("bfsDnldCrashParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -274,7 +274,26 @@ def bfsBrokenPipeParser( line ):
     if match:
         val = ""
         logStr = " : BFS error broken pipe "
-        logIt("bfsBrokenPipeParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
+def bfsEPGDataDownloadFailureParser( line ):
+    #Jan 28 11:17:18 powertv epg: DLOG|EPG_LOAD|SIGNIFICANT_EVENT|gi_load: GI for day 2 not found either in disk cache nor memory cache, check wheather it is loading
+    global logHighlights
+
+    pattern = re.compile("^.*gi_load: GI for day 2 not found either in disk cache nor memory cache, check wheather it is loading.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : BFS is up but NOT able to download EPG data "
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -295,7 +314,7 @@ def ipAddressParser( line ):
         val = val.strip()
 
         logStr = " : IP Address : "
-        logIt("ipAddressParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -316,7 +335,7 @@ def macAddressParser( line ):
         val = val.strip()
 
         logStr = " : MAC Address : "
-        logIt("macAddressParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -335,7 +354,7 @@ def recordingStartedParser( line ):
     if match:
         val = ""
         logStr = " : recording started"
-        logIt("recordingStartedParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -357,7 +376,7 @@ def recordingStarted2Parser( line ):
         val = val.strip()
 
         logStr = " : start recording program = "
-        logIt("recordingStarted2Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -376,7 +395,7 @@ def recordingStoppedParser( line ):
     if match:
         val = ""
         logStr = " : recording stopped"
-        logIt("recordingStoppedParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -397,7 +416,7 @@ def recordingStopped2Parser( line ):
         val = val.strip()
 
         logStr = " : recording stopped = "
-        logIt("recordingStopped2Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -416,7 +435,7 @@ def recordingDeletedParser( line ):
     if match:
         val = ""
         logStr = " : recording deleted"
-        logIt("recordingDeletedParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -437,7 +456,7 @@ def recordingDeleted2Parser( line ):
         val = val.strip()
         
         logStr = " : recording deleted = "
-        logIt("recordingDeleted2Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -456,7 +475,7 @@ def recordingPlaybackStartedParser( line ):
     if match:
         val = ""
         logStr = " : recording playback started"
-        logIt("recordingPlaybackStartedParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -476,7 +495,7 @@ def recordingPlaybackStarted2Parser( line ):
         val = val.strip()
         
         logStr = " : recording playback started = "
-        logIt("recordingPlaybackStarted2Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -506,7 +525,7 @@ def recordingFailureParser( line ):
         val = val.strip()
         
         logStr = " : Recording failed : "
-        logIt("recordingFailureParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -525,7 +544,7 @@ def recNotPlayable_BadStateParser( line ):
     if match:
         val = ""
         logStr = " : Recording not playable : Error Bad state: 3"
-        logIt("recNotPlayable_BadStateParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -544,7 +563,7 @@ def recNotPlayable_deAuthParser( line ):
     if match:
         val = ""
         logStr = " : Recording not playable : due to deauthorization"
-        logIt("recNotPlayable_deAuthParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -563,7 +582,7 @@ def blackScreen_Err19Parser( line ):
     if match:
         val = ""
         logStr = " : Black Screen on all channels : due to cpe_media_Stop2 error -19 CSCup37738 "
-        logIt("blackScreen_Err19Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -582,7 +601,7 @@ def blackScreen_vodStreamIssueParser( line ):
     if match:
         val = ""
         logStr = " : VOD playback black screen : due to stream issue"
-        logIt("blackScreen_vodStreamIssueParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -601,7 +620,7 @@ def blackScreen_signalStreamIssueParser( line ):
     if match:
         val = ""
         logStr = " : Black screen : stream issue - low signal or no stream"
-        logIt("blackScreen_signalStreamIssueParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -620,7 +639,7 @@ def blackScreen_patTimeoutParser( line ):
     if match:
         val = ""
         logStr = " : Black screen : PAT timeout"
-        logIt("blackScreen_patTimeoutParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -639,7 +658,7 @@ def blackScreen_pmtNoInfoParser( line ):
     if match:
         val = ""
         logStr = " : Black screen : stream issue - no pmt"
-        logIt("blackScreen_pmtNoInfoParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -658,7 +677,7 @@ def stuck04Parser( line ):
     if match:
         val = ""
         logStr = " : Stuck at -04- : due to SAM not ready "
-        logIt("stuck04Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -677,7 +696,7 @@ def serviceDeAuthParser( line ):
     if match:
         val = ""
         logStr = " : Service deauthorized "
-        logIt("serviceDeAuthParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -696,7 +715,7 @@ def noAuthECMParser( line ):
     if match:
         val = ""
         logStr = " : No authorized ECM in CA message "
-        logIt("noAuthECMParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -715,7 +734,7 @@ def channelNAParser( line ):
     if match:
         val = ""
         logStr = " : Channel is not available"
-        logIt("channelNAParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -734,7 +753,7 @@ def uiErrLoadingParser( line ):
     if match:
         val = ""
         logStr = " : Stuck on -05- due to ui error loading"
-        logIt("uiErrLoadingParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -754,7 +773,7 @@ def uiExceptionParser( line ):
     if match:
         val = ""
         logStr = " : exception in rtnui !!!"
-        logIt("uiExceptionParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -773,7 +792,7 @@ def notStagedParser( line ):
     if match:
         val = ""
         logStr = " : Stuck on -05- after Factory Restore due to not staged CSCux18653/CSCuu47200"
-        logIt("notStagedParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -801,7 +820,7 @@ def bootUpSequenceParser( line ):
         val = val.strip()
         
         logStr = " : Bootup step : "
-        logIt("bootUpSequenceParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -820,7 +839,7 @@ def network2WayReadyParser( line ):
     if match:
         val = ""
         logStr = " : Network is two way and System is Ready"
-        logIt("network2WayReadyParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -843,7 +862,7 @@ def maintSequenceParser( line ):
         val = val.strip()
         
         logStr = " : maintenance download "
-        logIt("maintSequenceParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -862,7 +881,7 @@ def vodSessionSetUpFailureParser( line ):
     if match:
         val = ""
         logStr = " : vod session setup failed - vod server not ready"
-        logIt("vodSessionSetUpFailureParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -881,7 +900,7 @@ def vodSessionSetUpFailure2Parser( line ):
     if match:
         val = ""
         logStr = " : vod session setup failed - no response from vod server"
-        logIt("vodSessionSetUpFailure2Parser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -900,7 +919,7 @@ def vodSessionTearDownParser( line ):
     if match:
         val = ""
         logStr = " : vod session torn down. It's normal if vod playback was stopped"
-        logIt("vodSessionTearDownParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -921,7 +940,7 @@ def vodPlaybackInitParser( line ):
         val = val.strip()
 
         logStr = " : vod playback of asset : "
-        logIt("vodPlaybackInitParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -954,7 +973,7 @@ def vodPlaybackParser( line ):
             val = val
 
         logStr = " : vod playback ongoing at "
-        logIt("vodPlaybackParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -975,7 +994,7 @@ def tunedProgramParser( line ):
         val = val.strip()
 
         logStr = " : Tuned to program : "
-        logIt("tunedProgramParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -996,7 +1015,7 @@ def tunedChannelParser( line ):
         val = val.strip()
         
         logStr = " : Tuned to channel : "
-        logIt("tunedChannelParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -1017,7 +1036,7 @@ def tunedChannelNumberParser( line ):
         val = val.strip()
         
         logStr = " : Tuned to channel : "
-        logIt("tunedChannelNumberParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -1036,7 +1055,7 @@ def docsisParser( line ):
     if match:
         val = ""
         logStr = " : Communication mode has been updated to : docsis"
-        logIt("docsisParser" + logStr + val, LB_Y, VERBOSE)
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
         logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
@@ -1052,6 +1071,7 @@ parsers = [
         bfsInitDoneParser,
         bfsDnldCrashParser,
         bfsBrokenPipeParser,
+        bfsEPGDataDownloadFailureParser,
         ipAddressParser,
         macAddressParser,
         recordingStartedParser,
