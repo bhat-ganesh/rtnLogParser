@@ -144,5 +144,8 @@ Jan 28 11:17:18 powertv epg: DLOG|EPG_LOAD|SIGNIFICANT_EVENT|gi_load: GI for day
 
 Feb  1 16:36:47 powertv syslog: DLOG|GALIO|NORMAL|package://5415C3E6-9E841FCC/js/zapp_modes.js at line 375 ZapperModeVideo::Connect is now Playing [object MOMVODAsset] : Name : undefined : ForestGumpMultiTrick3 - 60x
 
+Feb  1 10:04:55 powertv syslog:  Settop Extender Bridge: UpnPInitializeSSLContext - Retrying (# 182) to get DOCSIS cert info!
+
+Feb  1 10:04:31 powertv syslog: DLOG|DIAG_WS_PRIVATE|ERROR|(Not an Error) Informative: [UpdateLogFwdState][392]Box is either in davic mode or in one way!!!!! Disabling the log forwarding feature
 
 

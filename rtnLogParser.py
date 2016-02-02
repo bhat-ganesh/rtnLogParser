@@ -9,6 +9,7 @@ import re
 # globals
 
 NORMAL = "normal"
+SILENT = "silent"
 VERBOSE = "verbose"
 FORCE = "force"
 
@@ -132,7 +133,8 @@ def usageInfo():
     logIt("         : verbose : function level logs", LB_Y, FORCE)
     logIt("-------------------------------------------------------", LB_N, FORCE)
     logIt("Output:", LB_Y, FORCE)
-    logIt(sys.argv[0] + " will output log highlights on console", LB_N, FORCE)
+    logIt(sys.argv[0] + " will output log highlights on console:", LB_Y, FORCE)
+    logIt("line : timestamp : scenario : info ", LB_Y, FORCE)
     logIt("Look for "+ logSearchInfo + " in logFile_changed", LB_N, FORCE)
     logIt("*******************************************************", LB_N, FORCE)
     return
@@ -766,6 +768,25 @@ def uiErrLoadingParser( line ):
 
 #.............................................................................#
 
+def certInfoParser( line ):
+    # Feb  1 10:04:55 powertv syslog:  Settop Extender Bridge: UpnPInitializeSSLContext - Retrying (# 182) to get DOCSIS cert info!
+    global logHighlights
+
+    pattern = re.compile("^.*Retrying .* to get DOCSIS cert info.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Stuck on -05- due to failure in getting docsis cert info"
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def uiExceptionParser( line ):
     #Sep 11 15:08:44 powertv root: SCRIPT: unhandled exception: Attempt to convert null or undefined value recording to Object
     #Sep 11 19:08:52 powertv root: SCRIPT: unhandled exception: SETTINGS.CheckboxPane() is not defined
@@ -865,7 +886,7 @@ def maintSequenceParser( line ):
         val = re.sub('^.*MAINT_DOWNLOAD_', '', match.group())
         val = val.strip()
         
-        logStr = " : maintenance download "
+        logStr = " : Maintenance download : "
         logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -1069,6 +1090,25 @@ def docsisParser( line ):
 
 #.............................................................................#
 
+def davicParser( line ):
+    # Feb  1 10:04:31 powertv syslog: DLOG|DIAG_WS_PRIVATE|ERROR|(Not an Error) Informative: [UpdateLogFwdState][392]Box is either in davic mode or in one way!!!!! Disabling the log forwarding feature]
+    global logHighlights
+
+    pattern = re.compile("^.*Box is either in davic mode or in one way.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Box in DAVIC mode or in one way"
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 parsers = [
         keyPressParser,
         boxTypeParser,
@@ -1100,6 +1140,7 @@ parsers = [
         noAuthECMParser,
         channelNAParser,
         uiErrLoadingParser,
+        certInfoParser,
         uiExceptionParser,
         notStagedParser,
         bootUpSequenceParser,
@@ -1114,6 +1155,7 @@ parsers = [
         tunedChannelParser,
         tunedChannelNumberParser,
         docsisParser
+        # davicParser,
         ]
 
 def lineParser( line ):
@@ -1132,12 +1174,17 @@ try:
     inFile = sys.argv[1]
     f = open(inFile, "r")
 except:
-    logIt("ERR: invalid use", LB_Y, FORCE)
+    logIt("ERR: invalid use, no log file provided to parse", LB_Y, FORCE)
     usageInfo()
     quit()
 
 try:
     loggingMode = sys.argv[2]
+
+    if((loggingMode != NORMAL) and (loggingMode != SILENT) and (loggingMode != VERBOSE)):
+        logIt("WARN: incorrect logging mode provided, normal will be used.", LB_N, FORCE)
+        logIt("Available logging modes are normal, silent, verbose. Default=normal.", LB_Y, FORCE)
+        loggingMode = NORMAL
 except:
     loggingMode = NORMAL
 
@@ -1154,8 +1201,15 @@ with open(sys.argv[1], 'r') as file:
 # post process
 
 if logHighlights:
-    outFile = inFile+"_changed"
-    f = open(outFile, "w")
+
+    try:
+        outFile = inFile+"_changed"
+        f = open(outFile, "w")
+    except:
+        logIt("ERR: cannot write to file, no permissions", LB_Y, FORCE)
+        usageInfo()
+        quit()
+
     contents = "".join(contents)
     f.write(contents)
     f.close()
@@ -1176,6 +1230,6 @@ if logHighlights:
     logIt("To use changed file:", LB_N)
     logIt("mv " + outFile + " " + inFile)
 else:
-    logIt("WARN: nothing to parse in " + inFile)
+    logIt("WARN: nothing to parse in " + inFile, LB_Y, FORCE)
 
 #-----------------------------------------------------------------------------#
