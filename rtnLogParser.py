@@ -826,6 +826,25 @@ def notStagedParser( line ):
 
 #.............................................................................#
 
+def grpDefParser( line ):
+    # Feb  1 11:26:52 powertv csp_CPERP: DLOG|DLM|NORMAL|[downloadAppAndArtFile][96] Value of sam_isGrpDefParsed from BFS() = 0
+    global logHighlights
+
+    pattern = re.compile("^.*downloadAppAndArtFile.* Value of sam_isGrpDefParsed from.* = 0.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = ""
+        logStr = " : Stuck on -05- download manager is blocked on downloading grps_defs.txt"
+        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
+        line = line.rstrip('\n')
+        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
+        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        return True
+    return False
+
+#.............................................................................#
+
 def bootUpSequenceParser( line ):
     #Dec 31 19:01:13 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling:      Application started => Waiting for SessInit : 49.64 seconds, total time: 91.46 seconds (BUFFERED)
     #Dec 31 19:01:29 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -00- SessInit is ready => Waiting for Hub Id : 2.02 seconds, total time: 93.48 seconds (BUFFERED)
@@ -1143,6 +1162,7 @@ parsers = [
         certInfoParser,
         uiExceptionParser,
         notStagedParser,
+        grpDefParser,
         bootUpSequenceParser,
         network2WayReadyParser,
         maintSequenceParser,
