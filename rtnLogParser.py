@@ -1164,7 +1164,7 @@ def lineParser( line ):
 # main
 
 ap = argparse.ArgumentParser(description="RTN Log Parser")
-ap.add_argument("logFile", help="slog to parse")
+ap.add_argument('log', nargs='+', help="logs to parse")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
 ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs - for script debugging")
@@ -1175,56 +1175,56 @@ if args.verbose:
 elif args.quiet:
     loggingMode = QUIET
 
-try:
-    inFile = args.logFile
-    f = open(inFile, "r")
-except:
-    logIt("ERR: invalid use, no log file provided to parse", LB_Y, FORCE)
-    logIt("For parser usage help run "+ sys.argv[0] + " -h")
-    quit()
+for log in args.log:
+    logIt("Processing file: " + log)
+    
+    try:
+        inFile = log
+        f = open(inFile, "r")
+    except:
+        logIt("ERR : invalid log file", LB_Y, FORCE)
+        logIt("--------------------------------------------------------------------------------------", LB_Y)
+        continue
 
-logIt("Processing file: " + inFile)
-contents = f.readlines()
-f.close()
+    contents = f.readlines()
+    f.close()
 
-with open(inFile, 'r') as file:
-    for lineCount, line in enumerate(file):
-        lineParser(line)
-
-#.............................................................................#
+    with open(inFile, 'r') as file:
+        for lineCount, line in enumerate(file):
+            lineParser(line)
 
 # post process
 
-if logHighlights:
+    if logHighlights:
 
-    try:
-        outFile = inFile+"_changed"
-        f = open(outFile, "w")
-    except:
-        logIt("ERR: cannot write to file, no permissions", LB_Y, FORCE)
-        logIt("For parser usage help run "+ sys.argv[0] + " -h")
-        quit()
+        try:
+            outFile = inFile+"_changed"
+            f = open(outFile, "w")
+        except:
+            logIt("ERR: cannot write to file, no permissions : " + outFile, LB_N, FORCE)
+            quit()
 
-    contents = "".join(contents)
-    f.write(contents)
-    f.close()
-    
-    logIt(inFile + " processed successfully.", LB_N)
-    logIt("Following are highlights in " + inFile + ":")
-    
-    logIt("************************************************", LB_N)
-    logIt(logHighlights.strip(),0)
-    logIt("************************************************")
-    
-    logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
-    logIt("Look for " + logSearchInfo + " in " + outFile)
-    
-    logIt("To compare files:", LB_N)
-    logIt("vimdiff " + outFile + " " + inFile)
-    
-    logIt("To use changed file:", LB_N)
-    logIt("mv " + outFile + " " + inFile)
-else:
-    logIt("WARN: nothing to parse in " + inFile, LB_Y, FORCE)
+        contents = "".join(contents)
+        f.write(contents)
+        f.close()
+        
+        logIt(inFile + " processed successfully.", LB_N)
+        logIt("Following are highlights in " + inFile + ":")
+        
+        logIt("......................................................................................", LB_N)
+        logIt(logHighlights.strip(),0)
+        logIt("......................................................................................")
+        
+        logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
+        logIt("Look for " + logSearchInfo + " in " + outFile)
+        
+        logIt("To compare files:", LB_N)
+        logIt("vimdiff " + outFile + " " + inFile)
+        
+        logIt("To use changed file:", LB_N)
+        logIt("mv " + outFile + " " + inFile)
+    else:
+        logIt("WARN: nothing to parse", LB_Y, FORCE)
+    logIt("--------------------------------------------------------------------------------------", LB_Y)
 
 #-----------------------------------------------------------------------------#
