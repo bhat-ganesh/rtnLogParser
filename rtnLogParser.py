@@ -10,7 +10,7 @@ import argparse
 # globals
 
 NORMAL = "normal"
-SILENT = "silent"
+QUIET = "quiet"
 VERBOSE = "verbose"
 FORCE = "force"
 
@@ -1173,7 +1173,7 @@ args = ap.parse_args()
 if args.verbose:
     loggingMode = VERBOSE
 elif args.quiet:
-    loggingMode = SILENT
+    loggingMode = QUIET
 
 try:
     inFile = args.logFile
