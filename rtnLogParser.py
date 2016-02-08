@@ -3,6 +3,7 @@
 
 import sys
 import re
+import argparse
 
 #-----------------------------------------------------------------------------#
 
@@ -16,7 +17,7 @@ FORCE = "force"
 LB_Y = "line break yes"
 LB_N = "line break no"
 
-loggingMode = ""
+loggingMode = NORMAL
 logHighlights = ""
 logSearchInfo = "_rtnLogParser_"
 
@@ -109,34 +110,6 @@ def logIt(message, breakLine=LB_Y, displayLog=NORMAL):
             message = message + "\n"
 
         print message
-    return
-
-#.............................................................................#
-
-def usageInfo():
-    logIt("*******************************************************", LB_N, FORCE)
-    logIt("                 RTN Log Parser", LB_N, FORCE)
-    logIt("-------------------------------------------------------", LB_N, FORCE)
-    logIt("Usage:", LB_Y, FORCE)
-    logIt(sys.argv[0] + " logFile [logging]", LB_Y, FORCE)
-    logIt("Example  : ./rtnLogParser.py slog", LB_Y, FORCE)
-    logIt("-------------------------------------------------------", LB_N, FORCE)
-    logIt("Required argument:", LB_Y, FORCE)
-    logIt("@logFile : <path>/<logFile>", LB_Y, FORCE)
-    logIt("-------------------------------------------------------", LB_N, FORCE)
-    logIt("Optional argument:", LB_Y, FORCE)
-    logIt("@logging : used for script debugging", LB_N, FORCE)
-    logIt("         : Possible values = silent, normal, verbose", LB_N, FORCE)
-    logIt("         : Default = normal", LB_N, FORCE)
-    logIt("         : silent  : no logs", LB_N, FORCE)
-    logIt("         : normal  : high level logs", LB_N, FORCE)
-    logIt("         : verbose : function level logs", LB_Y, FORCE)
-    logIt("-------------------------------------------------------", LB_N, FORCE)
-    logIt("Output:", LB_Y, FORCE)
-    logIt(sys.argv[0] + " will output log highlights on console:", LB_Y, FORCE)
-    logIt("line : timestamp : scenario : info ", LB_Y, FORCE)
-    logIt("Look for "+ logSearchInfo + " in logFile_changed", LB_N, FORCE)
-    logIt("*******************************************************", LB_N, FORCE)
     return
 
 #.............................................................................#
@@ -1190,29 +1163,31 @@ def lineParser( line ):
 
 # main
 
+ap = argparse.ArgumentParser(description="RTN Log Parser")
+ap.add_argument("logFile", help="slog to parse")
+ag = ap.add_mutually_exclusive_group()
+ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
+ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs - for script debugging")
+args = ap.parse_args()
+
+if args.verbose:
+    loggingMode = VERBOSE
+elif args.quiet:
+    loggingMode = SILENT
+
 try:
-    inFile = sys.argv[1]
+    inFile = args.logFile
     f = open(inFile, "r")
 except:
     logIt("ERR: invalid use, no log file provided to parse", LB_Y, FORCE)
-    usageInfo()
+    logIt("For parser usage help run "+ sys.argv[0] + " -h")
     quit()
-
-try:
-    loggingMode = sys.argv[2]
-
-    if((loggingMode != NORMAL) and (loggingMode != SILENT) and (loggingMode != VERBOSE)):
-        logIt("WARN: incorrect logging mode provided, normal will be used.", LB_N, FORCE)
-        logIt("Available logging modes are normal, silent, verbose. Default=normal.", LB_Y, FORCE)
-        loggingMode = NORMAL
-except:
-    loggingMode = NORMAL
 
 logIt("Processing file: " + inFile)
 contents = f.readlines()
 f.close()
 
-with open(sys.argv[1], 'r') as file:
+with open(inFile, 'r') as file:
     for lineCount, line in enumerate(file):
         lineParser(line)
 
@@ -1227,7 +1202,7 @@ if logHighlights:
         f = open(outFile, "w")
     except:
         logIt("ERR: cannot write to file, no permissions", LB_Y, FORCE)
-        usageInfo()
+        logIt("For parser usage help run "+ sys.argv[0] + " -h")
         quit()
 
     contents = "".join(contents)
