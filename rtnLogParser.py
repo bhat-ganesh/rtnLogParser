@@ -4,6 +4,7 @@
 import sys
 import re
 import argparse
+import textwrap
 
 #-----------------------------------------------------------------------------#
 
@@ -1162,10 +1163,9 @@ def lineParser( line ):
 #-----------------------------------------------------------------------------#
 
 # main
-logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 
-ap = argparse.ArgumentParser(description="RTN Log Parser")
-ap.add_argument('log', nargs='+', help="logs to parse: [dir/log1 dir/log2 ... dir/logn] or [dir/*]")
+ap = argparse.ArgumentParser(description="RTN Log Parser", formatter_class=argparse.RawTextHelpFormatter)
+ap.add_argument('log', nargs='+', help="logs to parse:\nlog1 log2 ... logn\ndir/log1 dir/log2 ... dir/logn\ndir/*")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
 ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs - for script debugging")
@@ -1176,6 +1176,8 @@ if args.verbose:
 elif args.quiet:
     loggingMode = QUIET
 
+logIt("",LB_N)
+logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 for log in args.log:
     logIt("Processing file: " + log)
     
@@ -1183,7 +1185,7 @@ for log in args.log:
         inFile = log
         f = open(inFile, "r")
     except:
-        logIt("ERR : invalid log file", LB_Y, FORCE)
+        logIt("ERR : invalid log file: " + inFile, LB_Y, FORCE)
         logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
         continue
 
@@ -1226,7 +1228,7 @@ for log in args.log:
         logIt("To use changed file:", LB_N)
         logIt("mv " + outFile + " " + inFile)
     else:
-        logIt("WARN: nothing to parse", LB_Y, FORCE)
+        logIt("WARN: nothing to parse: " + inFile, LB_Y, FORCE)
     
     logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 #-----------------------------------------------------------------------------#
