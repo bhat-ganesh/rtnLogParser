@@ -693,7 +693,7 @@ def noAuthECMParser( line ):
     
     if match:
         val = ""
-        logStr = " : No authorized ECM in CA message "
+        logStr = " : Black screen due to no authorized ECM in CA message "
         logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
         line = line.rstrip('\n')
         contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
@@ -1162,9 +1162,10 @@ def lineParser( line ):
 #-----------------------------------------------------------------------------#
 
 # main
+logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 
 ap = argparse.ArgumentParser(description="RTN Log Parser")
-ap.add_argument('log', nargs='+', help="logs to parse")
+ap.add_argument('log', nargs='+', help="logs to parse: [dir/log1 dir/log2 ... dir/logn] or [dir/*]")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
 ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs - for script debugging")
@@ -1183,11 +1184,12 @@ for log in args.log:
         f = open(inFile, "r")
     except:
         logIt("ERR : invalid log file", LB_Y, FORCE)
-        logIt("--------------------------------------------------------------------------------------", LB_Y)
+        logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
         continue
 
     contents = f.readlines()
     f.close()
+    logHighlights = ""
 
     with open(inFile, 'r') as file:
         for lineCount, line in enumerate(file):
@@ -1211,9 +1213,9 @@ for log in args.log:
         logIt(inFile + " processed successfully.", LB_N)
         logIt("Following are highlights in " + inFile + ":")
         
-        logIt("......................................................................................", LB_N)
+        logIt(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .", LB_N)
         logIt(logHighlights.strip(),0)
-        logIt("......................................................................................")
+        logIt(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .", LB_Y)
         
         logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
         logIt("Look for " + logSearchInfo + " in " + outFile)
@@ -1225,6 +1227,6 @@ for log in args.log:
         logIt("mv " + outFile + " " + inFile)
     else:
         logIt("WARN: nothing to parse", LB_Y, FORCE)
-    logIt("--------------------------------------------------------------------------------------", LB_Y)
-
+    
+    logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 #-----------------------------------------------------------------------------#
