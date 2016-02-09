@@ -120,15 +120,28 @@ def logIt(message, breakLine=LB_Y, displayLog=NORMAL):
 def dateTimeParser( line ):
     dateTimePattern = re.compile("... .. ..:..:..")
     matchDateTime = re.search(dateTimePattern, line)
-    dateTime = matchDateTime.group()
-    # logIt("sys._getframe().f_code.co_name: " + dateTime, LB_N, VERBOSE)
-    return dateTime
+    try:
+        dateTime = matchDateTime.group()
+        # logIt("sys._getframe().f_code.co_name: " + dateTime, LB_N, VERBOSE)
+        return dateTime
+    except:
+        return ""
+
+#.............................................................................#
+
+def updateLog(line, parserName, message, lb):
+    global logHighlights
+
+    logIt(parserName + message, lb, VERBOSE)
+    line = line.rstrip('\n')
+    contents[lineCount] = line + " " + logSearchInfo + message + "\n"
+    logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + message + "\n"
+    return
 
 #.............................................................................#
 
 def keyPressParser( line ):
     #Jan 27 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --
-    global logHighlights
     global keyCode
 
     pattern = re.compile("^.*\| -- sending key .* --.*$")
@@ -150,10 +163,7 @@ def keyPressParser( line ):
         
         keyCode = val
         logStr = " : Key Press : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_N, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -161,7 +171,6 @@ def keyPressParser( line ):
 
 def boxTypeParser( line ):
     #Image created for 9k box.
-    global logHighlights
     global boxType
 
     pattern = re.compile("^Image created for .* box.*$")
@@ -182,10 +191,7 @@ def boxTypeParser( line ):
         
         boxType = val
         logStr = " : Box Type : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -193,14 +199,12 @@ def boxTypeParser( line ):
 
 def buildInfoParser( line ):
     
-
     return False
 
 #.............................................................................#
 
 def bfsInitDoneParser( line ):
     #Jan 25 10:47:55 powertv syslog: DLOG|BFSUTILITY|EMERGENCY|BFS Init Done!
-    global logHighlights
     global bfsInit
 
     pattern = re.compile("^.*\|BFS Init Done!.*$")
@@ -216,10 +220,7 @@ def bfsInitDoneParser( line ):
         
         bfsInit = val
         logStr = " : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -227,20 +228,15 @@ def bfsInitDoneParser( line ):
 
 def bfsDnldCrashParser( line ):
     #Jan 27 11:23:28 powertv syslog: DLOG|BFS_GET_MODULE|EMERGENCY|get_filter_setting_for_module - 625 assertion failed
-    global logHighlights
-
+    
     pattern = re.compile("^.* - 625 assertion failed.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('^.* - 625 assertion failed$', '625 assertion failed', match.group())
         val = val.strip()
-
-        logStr = " : BFS dnld crash CSCux30595 : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        logStr = " : BFS dnld crash CSCux30595"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -248,18 +244,13 @@ def bfsDnldCrashParser( line ):
 
 def bfsBrokenPipeParser( line ):
     #Jan 20 12:28:14 powertv csp_CPERP: DLOG|BFS_GET_MODULE|ERROR|bool CSCI_BFS_API::ActiveContext::_serializeAndSendPacket(int, BfsIpc::PacketBuilder&) - 222 Error sending eIpc_BeginDownload packet to BFS server - send /tmp/bfs_server error Broken pipe
-    global logHighlights
-
+    
     pattern = re.compile("^.*BFS.* error Broken pipe$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : BFS error broken pipe "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -267,18 +258,13 @@ def bfsBrokenPipeParser( line ):
 
 def bfsEPGDataDownloadFailureParser( line ):
     #Jan 28 11:17:18 powertv epg: DLOG|EPG_LOAD|SIGNIFICANT_EVENT|gi_load: GI for day 2 not found either in disk cache nor memory cache, check wheather it is loading
-    global logHighlights
-
+    
     pattern = re.compile("^.*gi_load: GI for day 2 not found either in disk cache nor memory cache, check wheather it is loading.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : BFS is up but NOT able to download EPG data "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -286,20 +272,15 @@ def bfsEPGDataDownloadFailureParser( line ):
 
 def ipAddressParser( line ):
     #Jan 28 12:20:13 powertv syslog: doc_StoreParameter: Host IPv4 address: 100.109.176.144.
-    global logHighlights
-
+    
     pattern = re.compile("^.*: Host IPv4 address: .*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('^.*: Host IPv4 address: ', '', match.group())
         val = val.strip()
-
         logStr = " : IP Address : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -307,20 +288,15 @@ def ipAddressParser( line ):
 
 def macAddressParser( line ):
     #Jan 28 12:19:15 powertv syslog: DLOG|MDA|ERROR|mda_network_init:336: MAC address = 68:EE:96:6F:15:B8
-    global logHighlights
-
+    
     pattern = re.compile("^.*mda_network_init.*MAC address = .*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('^.*mda_network_init.*MAC address = ', '', match.group())
         val = val.strip()
-
         logStr = " : MAC Address : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -328,40 +304,29 @@ def macAddressParser( line ):
 
 def recordingStartedParser( line ):
     # Jan 29 13:02:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_PersistentRecord:685 sess: 0x3ab3ee0  recordUrl: sadvr://dElWnhPo  start: 0.000000   stop: -2.000000    **SAIL API**
-    global logHighlights
-
+    
     pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_PersistentRecord.*recordUrl.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : recording started"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
 #.............................................................................#
 
 def recordingStarted2Parser( line ):
-    #Jan 29 15:10:30 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record added dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 0 state mom_recording_RECORDING rel @0396c668 Zooville Zooo]
     #Jan 27 11:24:56 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record added dvr://recording/00000000-0000-0000-0000-00000000000000000570 rec [@01a57220: dvr://recording/00000000-0000-0000-0000-00000000000000000570 play 1 state mom_recording_RECORDING rel @01a57ee0 The Price Is Right]
-    global logHighlights
-
+    
     pattern = re.compile("^.*GALIO\|NORMAL.*record added.*_RECORDING.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record added.*_RECORDING rel @........ ', '', match.group()))
         val = val.strip()
-
         logStr = " : start recording program = "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -369,18 +334,13 @@ def recordingStarted2Parser( line ):
 
 def recordingStoppedParser( line ):
     # Jan 29 13:04:28 powertv syslog: DLOG|MSP_MRDVR|ERROR|MRDvrServer:Csci_Msp_MrdvrSrv_NotifyRecordingStop:112 URL is : sctetv://003
-    global logHighlights
-
+    
     pattern = re.compile("^.*Csci_Msp_MrdvrSrv_NotifyRecordingStop.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : recording stopped"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -388,20 +348,15 @@ def recordingStoppedParser( line ):
 
 def recordingStopped2Parser( line ):
     # Jan 29 15:12:42 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record updated dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 1 state mom_recording_STOPPED rel <NULL> Zooville]
-    global logHighlights
-
+    
     pattern = re.compile("^.*GALIO\|NORMAL.*record updated.*_STOPPED.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record updated.*_STOPPED rel <NULL> ', '', match.group()))
         val = val.strip()
-
         logStr = " : recording stopped = "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -409,18 +364,14 @@ def recordingStopped2Parser( line ):
 
 def recordingDeletedParser( line ):
     # Jan 29 13:05:15 powertv syslog: DLOG|DVRUTIL|ERROR|Successfully Deleted file /mnt/dvr0/vNA4T1Rn
-    global logHighlights
-
+    
     pattern = re.compile("^.*DVRUTIL.*Successfully Deleted file.*$")
     match = re.search(pattern, line)
     
     if match:
         val = ""
         logStr = " : recording deleted"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -428,20 +379,15 @@ def recordingDeletedParser( line ):
 
 def recordingDeleted2Parser( line ):
     # Jan 29 15:19:06 powertv syslog: DLOG|GALIO|NORMAL|SCHED: record deleted (state != mom_recording_RECORDING) dvr://recording/00000000-0000-0000-0000-00000000000000000641 rec [@03989318: dvr://recording/00000000-0000-0000-0000-00000000000000000641 play 1 state mom_recording_STOPPED rel <NULL> Zooville]
-    global logHighlights
-
+    
     pattern = re.compile("^.*GALIO\|NORMAL.*record deleted.*_STOPPED.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub( '].*$', '', re.sub('^.*GALIO\|NORMAL.*record deleted.*_STOPPED rel <NULL> ', '', match.group()))
         val = val.strip()
-        
         logStr = " : recording deleted = "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -449,38 +395,29 @@ def recordingDeleted2Parser( line ):
 
 def recordingPlaybackStartedParser( line ):
     # Jan 29 13:11:57 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sadvr://mnt/dvr0/6oxGuu4M  session: 0x1b0a978     **SAIL API**
-    global logHighlights
-
+    
     pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*URL: sadvr:.*$")
     match = re.search(pattern, line)
     
     if match:
         val = ""
         logStr = " : recording playback started"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
 #.............................................................................#
 def recordingPlaybackStarted2Parser( line ):
     # Jan 29 15:14:01 powertv syslog: DLOG|GALIO|NORMAL|package://5415C3E6-8DBEB1FC/js/zapp_modes.js at line 375 ZapperModeVideo::Connect is now Playing [object MOMScheduledRecording] : Name : dvr://recording/00000000-0000-0000-0000-00000000000000000641 : Zooville
-    global logHighlights
-
+    
     pattern = re.compile("^.*GALIO\|NORMAL.*Connect is now Playing.*dvr.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('^.*GALIO\|NORMAL.*Connect is now Playing.*dvr.* : ', '', match.group())
         val = val.strip()
-        
         logStr = " : recording playback started = "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -491,8 +428,7 @@ def recordingFailureParser( line ):
     #Jan 25 06:00:04 powertv csp_CPERP: DLOG|DVR|Recording Failure|TimerHandler: Failure not enough disk space to record Breakfast Television AID 113
     #Jan 13 21:19:16 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050030: CLM UPDATE START
     #Jan 13 21:19:38 powertv csp_CPERP: DLOG|DVR|Recording Failure|FDR_log: DVRTXN050040: CLM UPDATE SUCCESS
-    global logHighlights
-
+    
     pattern = re.compile("^.*Recording Failure.*$")
     match = re.search(pattern, line)
     
@@ -507,10 +443,7 @@ def recordingFailureParser( line ):
         val = val.strip()
         
         logStr = " : Recording failed : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -518,18 +451,14 @@ def recordingFailureParser( line ):
 
 def recNotPlayable_BadStateParser( line ):
     #Dec 22 16:14:53 powertv syslog: DLOG|MSP_DVR|ERROR|RecSession:stopConvert:808 RecordSessionStateError: Error Bad state: 3
-    global logHighlights
-
+    
     pattern = re.compile("^.*RecordSessionStateError: Error Bad state: 3$")
     match = re.search(pattern, line)
     
     if match:
         val = ""
         logStr = " : Recording not playable : Error Bad state: 3"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -537,18 +466,14 @@ def recNotPlayable_BadStateParser( line ):
 
 def recNotPlayable_deAuthParser( line ):
     #Nov 13 10:49:26 powertv csp_CPERP: DLOG|CA_CAK|NORMAL|****** ECM 16 Digital_Response, result 0xb
-    global logHighlights
-
+    
     pattern = re.compile("^.*ECM 16 Digital_Response, result 0xb$")
     match = re.search(pattern, line)
     
     if match:
         val = ""
         logStr = " : Recording not playable : due to deauthorization"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -556,18 +481,14 @@ def recNotPlayable_deAuthParser( line ):
 
 def blackScreen_Err19Parser( line ):
     #Jan 11 09:26:29 powertv csp_CPERP: DLOG|MSP_MPLAYER|ERROR|DisplaySession:stop:1352 cpe_media_Stop error -19
-    global logHighlights
-
+    
     pattern = re.compile("^.*cpe_media_Stop error -19$")
     match = re.search(pattern, line)
     
     if match:
         val = ""
         logStr = " : Black Screen on all channels : due to cpe_media_Stop2 error -19 CSCup37738 "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -575,18 +496,13 @@ def blackScreen_Err19Parser( line ):
 
 def blackScreen_vodStreamIssueParser( line ):
     #Dec 21 15:35:08 powertv csp_CPERP: DLOG|MSP_MPLAYER|ERROR|Zapper:handleEvent:225 PsiTimeOutError: Warning - PSI not available. DoCallback – ContentNotFound!!
-    global logHighlights
-
+    
     pattern = re.compile("^.*PSI not available.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : VOD playback black screen : due to stream issue"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -594,18 +510,13 @@ def blackScreen_vodStreamIssueParser( line ):
 
 def blackScreen_signalStreamIssueParser( line ):
     #Dec 20 03:50:21 powertv csp_CPERP: DLOG|MSP_MPLAYER|EMERGENCY|Zapper:handleEvent:220 Warning - Tuner lock timeout.May be signal strength is low or no stream on tuned frequency!!
-    global logHighlights
-
+    
     pattern = re.compile("^.*signal strength is low or no stream.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Black screen : stream issue - low signal or no stream"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -613,18 +524,13 @@ def blackScreen_signalStreamIssueParser( line ):
 
 def blackScreen_patTimeoutParser( line ):
     #Dec 11 15:36:10 powertv syslog: DLOG|MSP_PSI|ERROR|Psi:dispatchEvent:125 PsiTimeOutError: Time out while waiting for PAT
-    global logHighlights
-
+    
     pattern = re.compile("^.*PsiTimeOutError: Time out while waiting for PAT$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Black screen : PAT timeout"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -632,18 +538,13 @@ def blackScreen_patTimeoutParser( line ):
 
 def blackScreen_pmtNoInfoParser( line ):
     #Nov 11 00:10:17 powertv csp_CPERP: DLOG|MSP_MPLAYER|ERROR|Zapper:GetComponents:1717 PSI/PMT Info Not found
-    global logHighlights
-
+    
     pattern = re.compile("^.*PMT Info Not found$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Black screen : stream issue - no pmt"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -651,18 +552,13 @@ def blackScreen_pmtNoInfoParser( line ):
 
 def stuck04Parser( line ):
     #Dec 31 19:01:37 powertv csp_CPERP: DLOG|SAM|ERROR|Thread Setname Failed:threadRetValue:0
-    global logHighlights
-
+    
     pattern = re.compile("^.*SAM.*Thread Setname Failed.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Stuck at -04- : due to SAM not ready "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -670,18 +566,13 @@ def stuck04Parser( line ):
 
 def serviceDeAuthParser( line ):
     #Nov 21 05:25:25 powertv csp_CPERP: DLOG|MSP_DVR|ERROR|dvr:dispatchEvent:1022 Service DeAuthorized by CAM
-    global logHighlights
-
+    
     pattern = re.compile("^.*Service DeAuthorized by CAM$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Service deauthorized "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -689,18 +580,13 @@ def serviceDeAuthParser( line ):
 
 def noAuthECMParser( line ):
     #Nov 21 05:25:25 powertv csp_CPERP: DLOG|CA_CAK|ERROR|PkCakDvrRecordSession_cronus.cpp:383 Async No authorized ECM in CA message
-    global logHighlights
-
+    
     pattern = re.compile("^.*No authorized ECM in CA message$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Black screen due to no authorized ECM in CA message "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -708,18 +594,13 @@ def noAuthECMParser( line ):
 
 def channelNAParser( line ):
     #Nov 13 01:43:41 powertv syslog: DLOG|SDV|ERROR|ccmisProtocol.cpp HandleProgramSelectIndication Channel is not available
-    global logHighlights
-
+    
     pattern = re.compile("^.*Channel is not available$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Channel is not available"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -727,18 +608,13 @@ def channelNAParser( line ):
 
 def uiErrLoadingParser( line ):
     #Nov 12 21:20:30 powertv bfsdnld: DLOG|BFS_GET_MODULE|ERROR|directory_update_timeout directory update taking more than 120 seconds
-    global logHighlights
-
+    
     pattern = re.compile("^.*directory update taking more than 120 seconds.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Stuck on -05- due to ui error loading"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -746,18 +622,13 @@ def uiErrLoadingParser( line ):
 
 def certInfoParser( line ):
     # Feb  1 10:04:55 powertv syslog:  Settop Extender Bridge: UpnPInitializeSSLContext - Retrying (# 182) to get DOCSIS cert info!
-    global logHighlights
-
+    
     pattern = re.compile("^.*Retrying .* to get DOCSIS cert info.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Stuck on -05- due to failure in getting docsis cert info"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -766,18 +637,13 @@ def certInfoParser( line ):
 def uiExceptionParser( line ):
     #Sep 11 15:08:44 powertv root: SCRIPT: unhandled exception: Attempt to convert null or undefined value recording to Object
     #Sep 11 19:08:52 powertv root: SCRIPT: unhandled exception: SETTINGS.CheckboxPane() is not defined
-    global logHighlights
-
+    
     pattern = re.compile("^.*SCRIPT: unhandled exception.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : exception in rtnui !!!"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -785,18 +651,13 @@ def uiExceptionParser( line ):
 
 def notStagedParser( line ):
     #Jan 28 12:47:57 powertv syslog: DLOG|DNCS_SETTINGS|EMERGENCY|SetStagingstatus:94 isStagingDefsApplied: 0 isHubSpecficStagingDefsApplied: 1 isAddressableStaged: 0
-    global logHighlights
-
+    
     pattern = re.compile("^.*SetStagingstatus.* isStagingDefsApplied: 0.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Stuck on -05- after Factory Restore due to not staged CSCux18653/CSCuu47200"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -804,18 +665,13 @@ def notStagedParser( line ):
 
 def grpDefParser( line ):
     # Feb  1 11:26:52 powertv csp_CPERP: DLOG|DLM|NORMAL|[downloadAppAndArtFile][96] Value of sam_isGrpDefParsed from BFS() = 0
-    global logHighlights
-
+    
     pattern = re.compile("^.*downloadAppAndArtFile.* Value of sam_isGrpDefParsed from.* = 0.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Stuck on -05- download manager is blocked on downloading grps_defs.txt"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -830,20 +686,15 @@ def bootUpSequenceParser( line ):
     #Jan 27 11:21:09 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -04- SAM is ready => Waiting for global config : 2.03 seconds, total time: 176.01 seconds
     #Jan 27 11:21:16 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling: -05- Global config is ready => Launching UI : 2.02 seconds, total time: 178.03 seconds
     #Jan 27 11:24:50 powertv syslog: DLOG|SAILMSG|ERROR|Bootup profiling:      UI launched => System ready : 218.45 seconds, total time: 396.48 seconds
-    global logHighlights
-
+    
     pattern = re.compile("^.*Bootup profiling:.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub( ' =>.*$', '', re.sub('^.*Bootup profiling: ', '', match.group()))
         val = val.strip()
-        
         logStr = " : Bootup step : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -851,18 +702,13 @@ def bootUpSequenceParser( line ):
 
 def network2WayReadyParser( line ):
     #Jan 28 12:21:13 powertv syslog: DLOG|SPM_VODCTLG|ERROR|vod-internal.cpp:void* tr_VodInit(void*):959: Network is two way and System is Ready
-    global logHighlights
-
+    
     pattern = re.compile("^.*Network is two way and System is Ready.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Network is two way and System is Ready"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -872,20 +718,15 @@ def maintSequenceParser( line ):
     # Jan 28 12:22:01 powertv syslog: DLOG|DLM|EMERGENCY|[sendSailMessage][1517] dlmWarningType:MAINT_DOWNLOAD_WARNING
     # Jan 28 12:22:21 powertv syslog: DLOG|DLM|EMERGENCY|[sendSailMessage][1517] dlmWarningType:MAINT_DOWNLOAD_REQUEST
     # Jan 28 12:23:00 powertv syslog: DLOG|DLM|EMERGENCY|[sendSailMessage][1517] dlmWarningType:MAINT_DOWNLOAD_COMPLETE
-    global logHighlights
-
+    
     pattern = re.compile("^.*MAINT_DOWNLOAD_.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('^.*MAINT_DOWNLOAD_', '', match.group())
         val = val.strip()
-        
         logStr = " : Maintenance download : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -893,18 +734,14 @@ def maintSequenceParser( line ):
 
 def vodSessionSetUpFailureParser( line ):
     #Jan 28 14:41:31 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|SeaChange_SessCntrl:HandleSessionConfirmResp:915 WARNING - SERVER NOT READY - Invalid DSMCC response received : 6 !!
-    global logHighlights
-
+    
     pattern = re.compile("^.*SERVER NOT READY - Invalid DSMCC response.*$")
     match = re.search(pattern, line)
     
     if match:
         val = ""
         logStr = " : vod session setup failed - vod server not ready"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -912,18 +749,13 @@ def vodSessionSetUpFailureParser( line ):
 
 def vodSessionSetUpFailure2Parser( line ):
     #Jan 29 10:55:23 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|VOD_SessCntl(TID:5470b340):ProcessTimeoutCallBack:415  NOT RECEIVED SERVER RESPONSE  - sending error to service layer !!
-    global logHighlights
-
+    
     pattern = re.compile("^.*VOD_SessCntl.* NOT RECEIVED SERVER RESPONSE.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : vod session setup failed - no response from vod server"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -931,18 +763,13 @@ def vodSessionSetUpFailure2Parser( line ):
 
 def vodSessionTearDownParser( line ):
     #Jan 29 10:38:33 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|StreamTearDown:122 Closing the socket[400]
-    global logHighlights
-
+    
     pattern = re.compile("^.*StreamTearDown.*Closing the socket.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : vod session torn down. It's normal if vod playback was stopped"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -951,20 +778,15 @@ def vodSessionTearDownParser( line ):
 def vodPlaybackInitParser( line ):
     #Jan 29 10:53:52 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: lscp://AssetId=1135&AppId=524289&BillingId=0&PurchaseTime=1454082831&RemainingTime=85482&EndPos=5635&srmManufacturer=Seachange&streamerManufacturer=Seachange&connectMgrIp=0x4161e479&Title=ForestGumpMultiTrick3 - 60x  session: 0x1b143b0     **SAIL API**
     # Feb  1 16:36:47 powertv syslog: DLOG|GALIO|NORMAL|package://5415C3E6-9E841FCC/js/zapp_modes.js at line 375 ZapperModeVideo::Connect is now Playing [object MOMVODAsset] : Name : undefined : ForestGumpMultiTrick3 - 60x
-    global logHighlights
-
+    
     pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*AssetId.*Title.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub( ' session.*$', '', re.sub('^.*IMediaPlayer:IMediaPlayerSession_Load.*AssetId.*Title=', '', match.group()))
         val = val.strip()
-
         logStr = " : vod playback of asset : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -979,8 +801,7 @@ def vodPlaybackParser( line ):
     # Jan 29 11:23:27 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-15 Den:2 Speed:-750.000000 #####
     # Jan 29 11:27:56 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-300 Den:10 Speed:-3000.000000 #####
     # Jan 29 11:28:00 powertv syslog: DLOG|MSP_ONDEMAND|ERROR|OnDemand(TID:5470b340):HandleCallback:1263 #### Ondemand ::Callback signal for Num:-600 Den:10 Speed:-6000.000000 #####
-    global logHighlights
-
+    
     pattern = re.compile("^.*OnDemand.*HandleCallback.*Speed:.*$")
     match = re.search(pattern, line)
     
@@ -994,31 +815,23 @@ def vodPlaybackParser( line ):
             val = val
 
         logStr = " : vod playback ongoing at "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
 #.............................................................................#
 
 def tunedProgramParser( line ):
-    #Jan 28 14:46:11 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/gadget_baseinfo.js at line 99 In base info update      Programme Name is : General Hosp. : CHANNEL NUMBER : 7
-    global logHighlights
-
+    #Jan 28 14:46:11 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/gadget_baseinfo.js at line 99 In base info update Programme Name is : General Hosp. : CHANNEL NUMBER : 7
+    
     pattern = re.compile("^.*gadget_baseinfo.* Programme Name is.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub(':.*$', '', re.sub('^.*gadget_baseinfo.* Programme Name is : ', '', match.group()))
         val = val.strip()
-
         logStr = " : Tuned to program : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -1026,20 +839,15 @@ def tunedProgramParser( line ):
 
 def tunedChannelParser( line ):
     #Jan 28 14:46:11 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/gadget_baseinfo.js at line 340 RTNUI : gadget_baseinfo : reallyUpdate : 7 <span>CITYT</span>
-    global logHighlights
-
+    
     pattern = re.compile("^.*gadget_baseinfo : reallyUpdate .*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub('<\/?span>', '', re.sub('^.*gadget_baseinfo : reallyUpdate : ', '', match.group()))
         val = val.strip()
-        
         logStr = " : Tuned to channel : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -1047,20 +855,15 @@ def tunedChannelParser( line ):
 
 def tunedChannelNumberParser( line ):
     #Jan 29 12:54:18 powertv syslog: DLOG|MSP_MPLAYER|EMERGENCY|IMediaPlayer:IMediaPlayerSession_Load:434  URL: sctetv://022  session: 0x1c6f4f8     **SAIL API**
-    global logHighlights
-
+    
     pattern = re.compile("^.*IMediaPlayer:IMediaPlayerSession_Load.*sctetv.*$")
     match = re.search(pattern, line)
     
     if match:
         val = re.sub(' session.*$', '', re.sub('^.*IMediaPlayer:IMediaPlayerSession_Load.*sctetv:\/\/', '', match.group()))
         val = val.strip()
-        
         logStr = " : Tuned to channel : "
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
         return True
     return False
 
@@ -1068,18 +871,13 @@ def tunedChannelNumberParser( line ):
 
 def docsisParser( line ):
     #Jan 28 12:20:36 powertv syslog: DLOG|GALIO|NORMAL|antclient://library/js/config.js at line 2039 RTNUI : Communication mode has been updated to : docsis : new IP Address : 100.109.176.144
-    global logHighlights
-
+    
     pattern = re.compile("^.*Communication mode has been updated to : docsis.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Communication mode has been updated to : docsis"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -1087,18 +885,13 @@ def docsisParser( line ):
 
 def davicParser( line ):
     # Feb  1 10:04:31 powertv syslog: DLOG|DIAG_WS_PRIVATE|ERROR|(Not an Error) Informative: [UpdateLogFwdState][392]Box is either in davic mode or in one way!!!!! Disabling the log forwarding feature]
-    global logHighlights
-
+    
     pattern = re.compile("^.*Box is either in davic mode or in one way.*$")
     match = re.search(pattern, line)
     
     if match:
-        val = ""
         logStr = " : Box in DAVIC mode or in one way"
-        logIt(sys._getframe().f_code.co_name + logStr + val, LB_Y, VERBOSE)
-        line = line.rstrip('\n')
-        contents[lineCount] = line + " " + logSearchInfo + logStr + val + "\n"
-        logHighlights += "line " + str(lineCount+1) + " : " + dateTimeParser(line) + logStr + val + "\n"
+        updateLog(line, sys._getframe().f_code.co_name, logStr, LB_N)
         return True
     return False
 
@@ -1167,11 +960,11 @@ def lineParser( line ):
 # main
 
 ap = argparse.ArgumentParser(description="RTN Log Parser", formatter_class=argparse.RawTextHelpFormatter)
-ap.add_argument('log', nargs='+', help="logs (normal/zipped) to parse :\ndir/log1 dir/log2 ... dir/logn\ndir/log*\ndir/*\nuse -u option to parse zipped log")
+ap.add_argument('log', nargs='+', help="normal or compressed logs to parse. use -u option to uncompress.\ndir/log1 dir/log2 dir/log3.gz ... dir/logn\ndir/log*\ndir/*")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
-ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs - for script debugging")
-ap.add_argument("-u", "--unzip", action="store_true", help = "gunzip log")
+ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs")
+ap.add_argument("-u", "--uncompress", action="store_true", help = "uncompress log.gz")
 args = ap.parse_args()
 
 if args.verbose:
