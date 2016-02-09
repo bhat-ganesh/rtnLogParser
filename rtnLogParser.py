@@ -5,6 +5,8 @@ import sys
 import re
 import argparse
 import textwrap
+import os
+import subprocess
 
 #-----------------------------------------------------------------------------#
 
@@ -1165,10 +1167,11 @@ def lineParser( line ):
 # main
 
 ap = argparse.ArgumentParser(description="RTN Log Parser", formatter_class=argparse.RawTextHelpFormatter)
-ap.add_argument('log', nargs='+', help="logs to parse:\nlog1 log2 ... logn\ndir/log1 dir/log2 ... dir/logn\ndir/*")
+ap.add_argument('log', nargs='+', help="logs (normal/zipped) to parse :\ndir/log1 dir/log2 ... dir/logn\ndir/log*\ndir/*\nuse -u option to parse zipped log")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
 ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs - for script debugging")
+ap.add_argument("-u", "--unzip", action="store_true", help = "gunzip log")
 args = ap.parse_args()
 
 if args.verbose:
@@ -1176,10 +1179,11 @@ if args.verbose:
 elif args.quiet:
     loggingMode = QUIET
 
+
 logIt("",LB_N)
 logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 for log in args.log:
-    logIt("Processing file: " + log)
+    logIt("Processing file : " + log)
     
     try:
         inFile = log
@@ -1188,6 +1192,15 @@ for log in args.log:
         logIt("ERR : invalid log file: " + inFile, LB_Y, FORCE)
         logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
         continue
+
+    if args.unzip:
+        logName, logExtension = os.path.splitext(log)
+        if (logExtension == ".gz"):
+            logIt("Unzipping log : " + log)
+            subprocess.call(["gunzip", logName])
+            f.close()
+            inFile = logName
+            f = open(inFile, "r")
 
     contents = f.readlines()
     f.close()
