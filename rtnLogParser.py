@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+__author__ = "Ganesh Bhat <ganesbha@cisco.com>"
+__version__ = "1.0"
+__date__ = "2016-Feb-11"
+
 import sys
 import re
 import argparse
@@ -975,7 +979,7 @@ def lineParser( line ):
 
 # main
 
-ap = argparse.ArgumentParser(description="RTN Log Parser", formatter_class=argparse.RawTextHelpFormatter)
+ap = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description="RTN Log Parser:\n  version\t    " + __version__ + "\n  date\t\t    " + __date__ + "\n  author\t    " + __author__)
 ap.add_argument('log', nargs='+', help="normal or compressed logs to parse. use -u option to uncompress.\ndir/log1 dir/log2 dir/log3.gz ... dir/logn\ndir/log*\ndir/*")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
