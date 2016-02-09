@@ -897,6 +897,22 @@ def davicParser( line ):
 
 #.............................................................................#
 
+# def parserTemplate( line ):
+#     # sample log line goes here
+    
+#     pattern = re.compile("^.*regex goes here.*$")
+#     match = re.search(pattern, line)
+    
+#     if match:
+#         val = re.sub('^.* optional further string match', 'new string', match.group())
+#         val = val.strip()
+#         logStr = " : final log string to be displayed "
+#         updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
+#         return True
+#     return False
+
+#.............................................................................#
+
 parsers = [
         keyPressParser,
         boxTypeParser,
@@ -986,10 +1002,10 @@ for log in args.log:
         logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
         continue
 
-    if args.unzip:
+    if args.uncompress:
         logName, logExtension = os.path.splitext(log)
         if (logExtension == ".gz"):
-            logIt("Unzipping log : " + log)
+            logIt("Uncompressing log : " + log)
             subprocess.call(["gunzip", logName])
             f.close()
             inFile = logName
