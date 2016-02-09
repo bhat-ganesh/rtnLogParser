@@ -901,7 +901,57 @@ def davicParser( line ):
 
 #.............................................................................#
 
-# def parserTemplate( line ):
+def zodiacLoggingParser( line ):
+    # Feb  9 16:32:35 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [] - 16:32:35.832 - [I]: logging for ZTAP turned off
+    # Feb  9 16:32:36 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [] - 16:32:36.666 - [I]: logging for ZTAP turned on
+    
+    pattern = re.compile("^.*logging for ZTAP turned .*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('^.* logging for ZTAP turned ', '', match.group())
+        val = val.strip()
+        logStr = " : Zodiac logging tunred "
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
+        return True
+    return False
+
+#.............................................................................#
+
+def searchRequestParser( line ):
+    # iFeb  9 16:36:32 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [ZSEA] - 16:36:32.648 - [D]: request(searchObjectOrText: ABC)
+    
+    pattern = re.compile("^.*ZSEA.*searchObjectOrText: .*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub( '\).*$', '', re.sub('^.*ZSEA.*searchObjectOrText: ', '', match.group()))
+        val = val.strip()
+        logStr = " : Searching for : "
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
+        return True
+    return False
+
+#.............................................................................#
+
+def searchResultSelectParser( line ):
+    # Feb  9 16:35:34 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [ZSEA] - 16:35:34.432 - [D]: onResultsEnter [PERSONALITY] [<em>A</em>ngela <em>B</em>assett]
+    # Feb  9 16:37:50 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [ZSEA] - 16:37:50.775 - [D]: onResultsEnter [PERSONALITY] [<em>A</em>lexander <em>B</em>.<em>C</em>ollett]
+    
+    pattern = re.compile("^.*ZSEA.*onResultsEnter.*$")
+    match = re.search(pattern, line)
+    
+    if match:
+        val = re.sub('\<\/em\>', '', re.sub('\<em\>', '', re.sub('^.*ZSEA.*onResultsEnter \[PERSONALITY\] ', '', match.group())))
+        val = val.strip()
+        logStr = " : search asset selected : "
+        updateLog(line, sys._getframe().f_code.co_name, logStr + val, LB_N)
+        return True
+    return False
+
+#.............................................................................#
+
+# def templateParser( line ):
 #     # sample log line goes here
     
 #     pattern = re.compile("^.*regex goes here.*$")
@@ -963,8 +1013,11 @@ parsers = [
         tunedProgramParser,
         tunedChannelParser,
         tunedChannelNumberParser,
-        docsisParser
+        docsisParser,
         # davicParser,
+        zodiacLoggingParser,
+        searchRequestParser,
+        searchResultSelectParser
         ]
 
 def lineParser( line ):
@@ -979,12 +1032,12 @@ def lineParser( line ):
 
 # main
 
-ap = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description="RTN Log Parser:\n  version\t    " + __version__ + "\n  date\t\t    " + __date__ + "\n  author\t    " + __author__)
+ap = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description="\t\t\t--------------\n"+"\t\t\tRTN Log Parser\n"+"\t\t\t--------------\n"+"  version\t    " + __version__ + "\n  date\t\t    " + __date__ + "\n  author\t    " + __author__)
 ap.add_argument('log', nargs='+', help="normal or compressed logs to parse. use -u option to uncompress.\ndir/log1 dir/log2 dir/log3.gz ... dir/logn\ndir/log*\ndir/*")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
-ag.add_argument("-q", "--quiet", action="store_true", help = "no parser logs")
-ap.add_argument("-u", "--uncompress", action="store_true", help = "uncompress log.gz")
+ag.add_argument("-q", "--quiet", action="store_true", help = "no  parser logs")
+ap.add_argument("-u", "--uncompress", action="store_true", help = "uncompress logs")
 args = ap.parse_args()
 
 if args.verbose:
