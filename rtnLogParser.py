@@ -284,6 +284,25 @@ def regexParser( regexList ):
 
 #.............................................................................#
 
+# parser structure
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+# # sample log line goes here
+# [
+#     parserFunction or '' if generic regexParser is used,
+#     [
+#         ['regex to find',  'string to replace regex'],
+#         ['regex2 to find', 'string to replace regex2'],
+#        
+#         ...
+#         ...
+#         ...
+#
+#         ['regexN to find', 'string to replace regexN']
+#     ]
+# ]
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+
 parsers = [
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
             # Jan 27 16:53:41 powertv syslog: DLOG|GALIO|NORMAL| -- sending key 462 --
