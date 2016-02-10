@@ -87,7 +87,7 @@ boxTypeMap = {
     '9k'  : 'G8 9K',
     '8k'  : 'G6 8K',
     '4k'  : 'G6 4K',
-    '10k' : 'G10 10K'
+    '5k'  : 'G10 5K'
 }
 
 bfsInit = ""
@@ -1032,8 +1032,17 @@ def lineParser( line ):
 
 # main
 
-ap = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, description="\t\t\t--------------\n"+"\t\t\tRTN Log Parser\n"+"\t\t\t--------------\n"+"  version\t    " + __version__ + "\n  date\t\t    " + __date__ + "\n  author\t    " + __author__)
-ap.add_argument('log', nargs='+', help="normal or compressed logs to parse. use -u option to uncompress.\ndir/log1 dir/log2 dir/log3.gz ... dir/logn\ndir/log*\ndir/*")
+ap = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter, 
+                            description="\t\t\t--------------\n"+
+                                        "\t\t\tRTN Log Parser\n"+
+                                        "\t\t\t--------------\n"+
+                                        "\n  version\t    " + __version__ + 
+                                        "\n  date\t\t    " + __date__ + 
+                                        "\n  author\t    " + __author__)
+ap.add_argument('log', nargs='+', help ="normal or compressed logs to parse. use -u option to uncompress.\n" +
+                                        "dir/log1 dir/log2 dir/log3.gz ... dir/logn\n" + 
+                                        "dir/log*\n" +
+                                        "dir/*")
 ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
 ag.add_argument("-q", "--quiet", action="store_true", help = "no  parser logs")
@@ -1045,9 +1054,7 @@ if args.verbose:
 elif args.quiet:
     loggingMode = QUIET
 
-
-logIt("",LB_N)
-logIt("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
+logIt("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -", LB_Y)
 for log in args.log:
     logIt("Processing file : " + log)
     
@@ -1081,7 +1088,7 @@ for log in args.log:
     if logHighlights:
 
         try:
-            outFile = inFile+"_changed"
+            outFile = inFile+"_parsed"
             f = open(outFile, "w")
         except:
             logIt("ERR: cannot write to file, no permissions : " + outFile, LB_N, FORCE)
@@ -1095,16 +1102,16 @@ for log in args.log:
         logIt("Following are highlights in " + inFile + ":")
         
         logIt(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .", LB_N)
-        logIt(logHighlights.strip(),0)
+        logIt(logHighlights.strip(), 0)
         logIt(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .", LB_Y)
         
-        logIt("Log highlights are also embedded in output file : " + outFile, LB_N)
+        logIt("Log highlights are embedded in outputfile : " + outFile, LB_N)
         logIt("Look for " + logSearchInfo + " in " + outFile)
         
-        logIt("To compare files:", LB_N)
+        logIt("To compare :", LB_N)
         logIt("vimdiff " + outFile + " " + inFile)
         
-        logIt("To use changed file:", LB_N)
+        logIt("To override :", LB_N)
         logIt("mv " + outFile + " " + inFile)
     else:
         logIt("WARN: nothing to parse: " + inFile, LB_Y, FORCE)
