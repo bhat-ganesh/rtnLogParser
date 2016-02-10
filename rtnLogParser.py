@@ -47,6 +47,7 @@ keyMap = {
     '40' : 'down',
     '37' : 'left',
     '39' : 'right',
+    '27' : '27 - what is this key',
     '458' : 'guide',
     '405' : 'A',
     '406' : 'B',
@@ -1047,6 +1048,7 @@ ag = ap.add_mutually_exclusive_group()
 ag.add_argument("-v", "--verbose", action="store_true", help = "all parser logs - for script debugging")
 ag.add_argument("-q", "--quiet", action="store_true", help = "no  parser logs")
 ap.add_argument("-u", "--uncompress", action="store_true", help = "uncompress logs")
+ap.add_argument("-o", "--overwrite", action="store_true", help = "overwrite original log with parsed log")
 args = ap.parse_args()
 
 if args.verbose:
@@ -1108,11 +1110,13 @@ for log in args.log:
         logIt("Log highlights are embedded in outputfile : " + outFile, LB_N)
         logIt("Look for " + logSearchInfo + " in " + outFile)
         
-        logIt("To compare :", LB_N)
-        logIt("vimdiff " + outFile + " " + inFile)
+        logIt("To compare :\nvimdiff " + outFile + " " + inFile)
         
-        logIt("To override :", LB_N)
-        logIt("mv " + outFile + " " + inFile)
+        if args.overwrite:
+            logIt("Overwriting " + inFile +" with " + outFile, LB_N)
+            subprocess.call(["mv", outFile, inFile])
+        else:
+            logIt("To overwite :\nmv " + outFile + " " + inFile)
     else:
         logIt("WARN: nothing to parse: " + inFile, LB_Y, FORCE)
     
