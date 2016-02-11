@@ -656,7 +656,6 @@ parsers = [
                 '',
                 [
                     ['^.*gadget_baseinfo.* Programme Name is : ', 'Tuned to program : ']
-                    # [':.*$', '']
                 ]
             ],
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
