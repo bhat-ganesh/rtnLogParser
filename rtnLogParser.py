@@ -720,6 +720,62 @@ parsers = [
                     ['\<em\>', ''],
                     ['\<\/em\>', '']
                 ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set operation mode to kCss_DAVICStandardOpMode(1)
+            [
+                '',
+                [
+                    ['^.*davact_StoreParam.*OpMode\(1\).*$', 'boot in DAVIC to start out']
+                ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set direction mode to kCss_OOBDirMode(1)
+            [
+                '',
+                [
+                    ['^.*davact_Store.*OOBDirMode\(1\).*$', 'Communication mode : one way']
+                ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set mac boot mode to kCss_SlowMacBootMode(1)
+            [
+                '',
+                [
+                    ['^.*davact_Store.*SlowMacBootMode\(1\).*$', 'start in slow boot']
+                ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Feb 11 09:49:33 powertv syslog: vpod_cccm_ProcCccmEvent() Scheduling failSafeTimerID
+            [
+                '',
+                [
+                    ['^.*vpod_cccm.*Scheduling failSafeTimerID.*$', 'start of 20min failsafe timer']
+                ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Feb 11 09:49:33 powertv syslog: doc_StoreParameter: set operation mode to kCss_DOCSISIpDirectQpskOpMode(11) 
+            [
+                '',
+                [
+                    ['^.*set operation mode to kCss_DOCSISIpDirectQpskOpMode\(11\).*$', 'try to go to DOCSIS']
+                ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Feb 11 09:49:33 powertv syslog: doc_StoreParameter: set direction mode to kCss_OOBInteractiveDirMode(3)
+            [
+                '',
+                [
+                    ['^.*set direction mode to kCss_OOBInteractiveDirMode\(3\).*', 'go 2way']
+                ]
+            ],
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
+            # Feb 11 09:50:02 powertv syslog: vpod_cccm_ProcCccmEvent() Cancelling failSafeTimerID 43 because CM is in TwoWay Operational Mod 
+            [
+                '',
+                [
+                    ['^.*Cancelling failSafeTimerID .* TwoWay Operational.*', 'Cancel failsafe as CM is in 2way mode']
+                ]
             ]
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .#
         ]
@@ -802,7 +858,7 @@ for log in args.log:
         f.write(parserInfo + "\n")
         f.close()
         
-        logIt(inFile + " processed successfully.", LB_N)
+        logIt(inFile + " parsed successfully.", LB_N)
         logIt("Following are highlights in " + inFile + ":")
         
         logIt(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .", LB_N)

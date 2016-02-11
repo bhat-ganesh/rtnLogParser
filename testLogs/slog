@@ -157,3 +157,20 @@ Feb  9 16:36:32 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js
 Feb  9 16:35:34 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [ZSEA] - 16:35:34.432 - [D]: onResultsEnter [PERSONALITY] [<em>A</em>ngela <em>B</em>assett]
 Feb  9 16:37:50 powertv syslog: DLOG|GALIO|NORMAL|package://5F2DD257-C79E59BB/js/debug.js at line 7 [ZSEA] - 16:37:50.775 - [D]: onResultsEnter [PERSONALITY] [<em>A</em>lexander <em>B</em>.<em>C</em>ollett]
 
+Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set operation mode to kCss_DAVICStandardOpMode(1)
+Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set direction mode to kCss_OOBDirMode(1)
+Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set CSS Tunnel Config: 127.1.0.0/255.255.0.0, uniquifier = 1 
+Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set mac boot mode to kCss_SlowMacBootMode(1)
+Dec 31 19:00:50 powertv syslog: davact_StoreParameter: set useProviderID to 0 
+Feb 11 09:49:33 powertv syslog: vpod_cccm_ProcCccmEvent() Scheduling failSafeTimerID
+Feb 11 09:49:33 powertv syslog: doc_StoreParameter: set operation mode to kCss_DOCSISIpDirectQpskOpMode(11)
+Feb 11 09:49:33 powertv syslog: doc_UpdateDhcpOption43VideoSec: video security is EMBED 
+Feb 11 09:49:33 powertv syslog: doc_StoreParameter: set direction mode to kCss_OOBInteractiveDirMode(3)
+Feb 11 09:49:33 powertv syslog: doc_StoreParameter: set DSG Tunnel Config: 127.2.0.0/255.255.0.0, uniquifier = 2 
+Feb 11 09:49:59 powertv syslog: DsgDocsisEvent: eventCode 68000300 (DHCP WARNING - Non-critical field invalid in response ;CM-MAC=7c:b2:1b:65:c5:41;CMTS-MAC=50:57:a8:8f:dc:1c;CM-QOS=1.0;CM-VER=3.0;) 
+Feb 11 09:50:02 powertv syslog: vpod_cccm_ProcCccmEvent() Cancelling failSafeTimerID 43 because CM is in TwoWay Operational Mode
+Feb 11 09:50:03 powertv syslog: doc_StoreParameter: set host IP List 1 
+Feb 11 09:50:04 powertv syslog: doc_StoreParameter: Host IPv4 address: 10.15.9.230.
+
+
+
